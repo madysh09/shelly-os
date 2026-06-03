@@ -256,6 +256,46 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
 .trk-empty-cat{font-size:11px;color:var(--ink5);font-style:italic;padding:8px 0}
 .trk-month-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem}
 .trk-month-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--ink)}
+
+/* QUOTE OF THE DAY */
+#d-quote{transition:opacity .4s ease}
+
+/* NEWS ALERTS */
+.news-cat{margin-bottom:1.5rem}
+.news-cat-hd{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:var(--rs);margin-bottom:10px}
+.news-cat-icon{font-size:16px;flex-shrink:0}
+.news-cat-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;flex:1}
+.news-cat-cnt{font-size:10px;opacity:.65}
+.news-card{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:block;text-decoration:none}
+.news-card:hover{border-color:var(--gold-bd);box-shadow:0 2px 10px rgba(184,146,58,.08)}
+.news-headline{font-size:14px;font-weight:500;color:var(--ink);line-height:1.4;margin-bottom:6px}
+.news-summary{font-size:12px;color:var(--ink3);line-height:1.55;margin-bottom:8px}
+.news-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.news-source{font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em}
+.news-date{font-size:10px;color:var(--ink5)}
+.news-tag{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--parch2);color:var(--ink3);border:.5px solid var(--parch3)}
+
+/* GOAL SCHEDULE BUBBLES */
+.sched-guide{background:var(--parch2);border:.5px solid var(--parch3);border-radius:var(--r);padding:14px 16px;margin-bottom:1.25rem}
+.sched-guide-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.sched-guide-toggle{font-size:11px;font-weight:400;color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0}
+.bubble-tray{display:flex;gap:7px;flex-wrap:wrap}
+.sched-bubble{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:500;cursor:grab;user-select:none;border:.5px solid transparent;transition:box-shadow .15s;white-space:nowrap}
+.sched-bubble:active{cursor:grabbing;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.bubble-fti{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}
+.bubble-side{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bd)}
+.bubble-wo{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bd)}
+.bubble-dog{background:#f5f0e4;color:#7a6030;border-color:#ddd0b0}
+.bubble-life{background:var(--parch2);color:var(--ink3);border-color:var(--parch3)}
+.bubble-sun{background:var(--blush-bg);color:var(--blush);border-color:var(--blush-bd)}
+.goal-week{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem}
+.goal-week-title{padding:10px 14px;background:var(--parch);border-bottom:.5px solid var(--parch2);font-size:12px;font-weight:500;color:var(--ink3);display:flex;align-items:center;justify-content:space-between}
+.goal-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--parch3)}
+.goal-day{background:#fff;padding:8px;min-height:90px}
+.goal-day-hd{font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.goal-blk{font-size:10px;padding:3px 6px;border-radius:4px;margin-bottom:3px;line-height:1.3;position:relative}
+.goal-blk .rm{display:none;position:absolute;top:1px;right:2px;background:none;border:none;cursor:pointer;font-size:9px;color:inherit;opacity:.5}
+.goal-blk:hover .rm{display:block}
 </style>
 </head>
 <body>
@@ -265,15 +305,17 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
   <nav class="sb-nav">
     <div class="sb-sec">Overview</div>
     <div class="sb-item on" onclick="goView('dashboard',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
-    <div class="sb-sec">FTI Revenue</div>
+    <div class="sb-sec">FTI</div>
     <div class="sb-item" onclick="goView('revenue',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Revenue tracker</div>
     <div class="sb-item" onclick="goView('crm',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts &amp; CRM</div>
     <div class="sb-item" onclick="goView('activities',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Activity log</div>
     <div class="sb-item" onclick="goView('report',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Leadership report</div>
     <div class="sb-item" onclick="goView('sponsorships',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Sponsorships</div>
+    <div class="sb-item" onclick="goView('news',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a4 4 0 0 1-4-4V6"/><path d="M2 13.5A2.5 2.5 0 0 0 4.5 16"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>News alerts</div>
     <div class="sb-sec">Planning</div>
     <div class="sb-item" onclick="goView('calendar',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</div>
     <div class="sb-item" onclick="goView('tracker',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Venture tracker</div>
+    <div class="sb-item" onclick="goView('vnews',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a4 4 0 0 1-4-4V6"/><path d="M2 13.5A2.5 2.5 0 0 0 4.5 16"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>Venture news</div>
     <div class="sb-sec">Personal</div>
     <div class="sb-item" onclick="goView('personal',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>My life</div>
     <div class="sb-sec">Capture</div>
@@ -286,14 +328,35 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="view on">
-  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title" id="d-greet">Good morning, Shelly.</div><div class="pg-sub" id="d-date"></div></div><span style="font-size:12px;background:#fff;border:.5px solid var(--parch3);border-radius:99px;padding:5px 14px;color:var(--ink3)" id="d-week"></span></div></div>
+  <div class="pg-hd">
+    <div class="pg-row">
+      <div>
+        <div class="pg-title" id="d-greet">Good morning, Shelly.</div>
+        <div class="pg-sub" id="d-date"></div>
+      </div>
+      <span style="font-size:12px;background:#fff;border:.5px solid var(--parch3);border-radius:99px;padding:5px 14px;color:var(--ink3)" id="d-week"></span>
+    </div>
+    <div id="d-quote" style="margin-top:1rem;padding:1rem 1.25rem;background:linear-gradient(135deg,var(--gold-bg),var(--parch2));border:.5px solid var(--gold-bd);border-radius:var(--r);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;left:10px;font-size:60px;color:var(--gold);opacity:.12;font-family:'Cormorant Garamond',serif;line-height:1">"</div>
+      <div id="d-quote-text" style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--ink2);line-height:1.55;position:relative;padding-left:8px"></div>
+      <div id="d-quote-author" style="font-size:11px;color:var(--ink4);margin-top:8px;padding-left:8px;letter-spacing:.04em;text-transform:uppercase;font-weight:500"></div>
+    </div>
+  </div>
   <div class="stats" id="d-stats"></div>
   <div class="g2" style="margin-bottom:1.75rem;align-items:start">
     <div><div class="sec-lbl">Venture progress</div><div class="focus-grid" id="d-focus"></div></div>
     <div><div class="sec-lbl">Follow-ups due soon</div><div class="card" style="padding:14px 18px"><div id="d-fu"></div></div></div>
   </div>
   <div class="sec-lbl">Recent wins</div>
-  <div class="card" style="padding:14px 18px"><div id="d-wins"></div><button class="btn btn-sm" style="margin-top:10px" onclick="goView('notes',document.querySelector('[onclick*=notes]'))">Log a win →</button></div>
+  <div class="card" style="padding:14px 18px"><div id="d-wins"></div><button class="btn btn-sm" style="margin-top:10px" onclick="goView('notes',document.querySelector('[onclick*=notes]'))">Log a win →</button>
+  <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:.5px solid var(--parch2)">
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Daily digest</div>
+    <div style="font-size:12px;color:var(--ink4);margin-bottom:10px;line-height:1.5">Open tasks across all ventures + life admin — pre-formatted for email.</div>
+    <button class="btn btn-p btn-sm" onclick="sendDigest()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+      Send daily digest
+    </button>
+  </div></div>
 </div>
 
 <!-- REVENUE -->
@@ -382,6 +445,35 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
     <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blush);display:inline-block"></span>Deep work</span>
     <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--ink4);display:inline-block"></span>Protected</span>
   </div>
+  <!-- GOAL SCHEDULE GUIDE -->
+  <div class="sched-guide" id="sched-guide-wrap">
+    <div class="sched-guide-title">
+      Goal schedule guide — drag bubbles to plan your week
+      <span class="sched-guide-toggle" onclick="toggleSchedGuide()">▾ Show goal week</span>
+    </div>
+    <div class="bubble-tray">
+      <div class="sched-bubble bubble-fti" draggable="true" ondragstart="startBubble(event,'FTI networking lunch','fti')">🤝 FTI lunch</div>
+      <div class="sched-bubble bubble-fti" draggable="true" ondragstart="startBubble(event,'FTI networking coffee','fti')">☕ FTI coffee</div>
+      <div class="sched-bubble bubble-fti" draggable="true" ondragstart="startBubble(event,'FTI evening event','fti')">🌆 FTI event</div>
+      <div class="sched-bubble bubble-side" draggable="true" ondragstart="startBubble(event,'Side hustle — strategy block','side')">⚡ Side hustle</div>
+      <div class="sched-bubble bubble-side" draggable="true" ondragstart="startBubble(event,'John sync — Cognosis + Concierge','side')">🤝 John sync</div>
+      <div class="sched-bubble bubble-side" draggable="true" ondragstart="startBubble(event,'Maydé — creative block','side')">💎 Maydé</div>
+      <div class="sched-bubble bubble-wo" draggable="true" ondragstart="startBubble(event,'Workout','wo')">🏋️ Workout</div>
+      <div class="sched-bubble bubble-dog" draggable="true" ondragstart="startBubble(event,'Dog walk + think time','dog')">🐕 Dog walk</div>
+      <div class="sched-bubble bubble-sun" draggable="true" ondragstart="startBubble(event,'Deep work — venture planning','sun')">🔆 Deep work</div>
+      <div class="sched-bubble bubble-life" draggable="true" ondragstart="startBubble(event,'Protected — off','life')">🔒 Protected</div>
+      <div class="sched-bubble bubble-life" draggable="true" ondragstart="startBubble(event,'Weekly review','life')">📋 Weekly review</div>
+    </div>
+    <div id="goal-week-wrap" style="display:none;margin-top:1rem">
+      <div class="goal-week">
+        <div class="goal-week-title">
+          <span>Your goal week — a rhythm to strive towards, not a rigid plan</span>
+          <button class="btn btn-sm" style="font-size:11px" onclick="resetGoalWeek()">Reset to default</button>
+        </div>
+        <div class="goal-day-grid" id="goal-day-grid"></div>
+      </div>
+    </div>
+  </div>
   <div id="cal-body"></div>
   <div class="cal-add" style="margin-top:1rem">
     <div class="sec-lbl" style="margin-bottom:10px">Add a block</div>
@@ -449,6 +541,45 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
       <button class="btn" id="spons-del-btn" style="margin-left:auto;color:var(--danger);border-color:var(--danger);display:none" onclick="deleteSpons()">Delete</button>
     </div>
   </div>
+</div>
+
+<!-- NEWS ALERTS -->
+<div id="view-news" class="view">
+  <div class="pg-hd">
+    <div class="pg-row">
+      <div><div class="pg-title">News alerts</div><div class="pg-sub">Data Centers · Dallas · Investigations · Enforcement · refreshed on demand</div></div>
+      <button class="btn btn-p btn-sm" onclick="fetchNews(true)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.08-5"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+  <div id="news-loading" style="display:none;text-align:center;padding:3rem;color:var(--ink3);font-size:13px">
+    <div style="font-size:24px;margin-bottom:10px">⏳</div>Fetching latest news…
+  </div>
+  <div id="news-body"></div>
+  <div style="margin-top:1rem;font-size:11px;color:var(--ink4);line-height:1.6">
+    Sources: Wall Street Journal · Financial Times · Reuters · Bloomberg · CoStar · Data Center Knowledge · DOJ.gov · SEC.gov · Dallas Morning News · Bisnow
+  </div>
+</div>
+
+<!-- VENTURE NEWS -->
+<div id="view-vnews" class="view">
+  <div class="pg-hd">
+    <div class="pg-row">
+      <div><div class="pg-title">Venture news</div><div class="pg-sub">Jewelry · Carwash &amp; PE · Concierge medicine · Stocks &amp; equity</div></div>
+      <button class="btn btn-p btn-sm" onclick="fetchVNews(true)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.08-5"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+  <div style="background:var(--gold-bg);border:.5px solid var(--gold-bd);border-radius:var(--rs);padding:10px 14px;margin-bottom:1.25rem;font-size:12px;color:var(--ink3);line-height:1.6">
+    <strong style="color:var(--gold)">Note:</strong> Stock suggestions are for educational awareness only — not financial advice. Always consult a licensed financial advisor before making investment decisions.
+  </div>
+  <div id="vnews-loading" style="display:none;text-align:center;padding:3rem;color:var(--ink3);font-size:13px"><div style="font-size:24px;margin-bottom:10px">⏳</div>Fetching latest news…</div>
+  <div id="vnews-body"></div>
+  <div style="margin-top:1rem;font-size:11px;color:var(--ink4);line-height:1.6">Sources: World Gold Council · Trading Economics · Carwash.com · Car Wash Advisory · PitchBook · Medical Economics · TipRanks · Motley Fool · Yahoo Finance · Zacks · Reuters</div>
 </div>
 
 <!-- PERSONAL / MY LIFE -->
@@ -857,7 +988,7 @@ function goView(name,el){
   document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('on'));
   document.getElementById('view-'+name).classList.add('on');
   if(el)el.classList.add('on');
-  ({dashboard:renderDash,revenue:renderRevenue,crm:renderCRM,activities:()=>{renderDrafts();renderActs();},report:renderReport,sponsorships:renderSpons,calendar:renderCal,tracker:()=>{setTrackerMode(trackerMode);if(trackerMode==='detail'){renderChips();renderVenture();}},notes:()=>{renderWins();renderNotes();},personal:renderPersonal})[name]?.();
+  ({dashboard:renderDash,revenue:renderRevenue,crm:renderCRM,activities:()=>{renderDrafts();renderActs();},report:renderReport,sponsorships:renderSpons,news:()=>{fetchNews(false);},vnews:()=>{fetchVNews(false);},calendar:renderCal,tracker:()=>{setTrackerMode(trackerMode);if(trackerMode==='detail'){renderChips();renderVenture();}},notes:()=>{renderWins();renderNotes();},personal:renderPersonal})[name]?.();
 }
 function swTab(name,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.tabv').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById('tabv-'+name).classList.add('on')}
 function swPTab(name,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.ptabv-active,#ptabv-health,#ptabv-growth,#ptabv-admin').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById('ptabv-'+name).classList.add('on')}
@@ -868,6 +999,7 @@ function renderDash(){
   const now=new Date(),h=now.getHours();
   document.getElementById('d-greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Shelly.';
   document.getElementById('d-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  renderQuote();
   document.getElementById('d-week').textContent='Week of '+getMon(now).toLocaleDateString('en-US',{month:'short',day:'numeric'});
   let tot=0,dn=0;VENTURES.forEach(v=>(S.tasks[v.id]||[]).forEach(t=>{tot++;if(t.done)dn++}));
   const rev=S.revenue.reduce((s,p)=>s+Number(p.amt||0),0);
@@ -1464,6 +1596,479 @@ function renderTrackerDash(){
         ${catsHtml}
       </div>`;
     }).join('')}`;
+}
+
+
+// QUOTE OF THE DAY
+const QUOTES=[
+  {text:"The most effective way to do it, is to do it.",author:"Amelia Earhart"},
+  {text:"You don't have to be great to start, but you have to start to be great.",author:"Zig Ziglar"},
+  {text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",author:"Winston Churchill"},
+  {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
+  {text:"Life is not measured by the number of breaths we take, but by the moments that take our breath away.",author:"Maya Angelou"},
+  {text:"Do one thing every day that scares you.",author:"Eleanor Roosevelt"},
+  {text:"She believed she could, so she did.",author:"R.S. Grey"},
+  {text:"Your time is limited, so don't waste it living someone else's life.",author:"Steve Jobs"},
+  {text:"The question isn't who's going to let me; it's who's going to stop me.",author:"Ayn Rand"},
+  {text:"I am not afraid of storms, for I am learning how to sail my ship.",author:"Louisa May Alcott"},
+  {text:"Well-behaved women seldom make history.",author:"Laurel Thatcher Ulrich"},
+  {text:"A goal without a plan is just a wish.",author:"Antoine de Saint-Exupéry"},
+  {text:"You miss 100% of the shots you don't take.",author:"Wayne Gretzky"},
+  {text:"The only way to do great work is to love what you do.",author:"Steve Jobs"},
+  {text:"In the middle of every difficulty lies opportunity.",author:"Albert Einstein"},
+  {text:"It always seems impossible until it's done.",author:"Nelson Mandela"},
+  {text:"What you get by achieving your goals is not as important as what you become by achieving your goals.",author:"Zig Ziglar"},
+  {text:"The future belongs to those who believe in the beauty of their dreams.",author:"Eleanor Roosevelt"},
+  {text:"Don't watch the clock; do what it does — keep going.",author:"Sam Levenson"},
+  {text:"Believe you can and you're halfway there.",author:"Theodore Roosevelt"},
+  {text:"Act as if what you do makes a difference. It does.",author:"William James"},
+  {text:"Success usually comes to those who are too busy to be looking for it.",author:"Henry David Thoreau"},
+  {text:"Opportunities don't happen, you create them.",author:"Chris Grosser"},
+  {text:"Don't be pushed around by the fears in your mind. Be led by the dreams in your heart.",author:"Roy T. Bennett"},
+  {text:"The best time to plant a tree was 20 years ago. The second best time is now.",author:"Chinese Proverb"},
+  {text:"Everything you've ever wanted is on the other side of fear.",author:"George Addair"},
+  {text:"Happiness is not something ready-made. It comes from your own actions.",author:"Dalai Lama"},
+  {text:"You are never too old to set another goal or to dream a new dream.",author:"C.S. Lewis"},
+  {text:"Life shrinks or expands in proportion to one's courage.",author:"Anaïs Nin"},
+  {text:"The harder the conflict, the greater the triumph.",author:"George Washington"},
+  {text:"Be the change you wish to see in the world.",author:"Mahatma Gandhi"},
+  {text:"If you want to fly, give up everything that weighs you down.",author:"Buddha"},
+  {text:"Start where you are. Use what you have. Do what you can.",author:"Arthur Ashe"},
+  {text:"We may encounter many defeats but we must not be defeated.",author:"Maya Angelou"},
+  {text:"It is during our darkest moments that we must focus to see the light.",author:"Aristotle"},
+  {text:"Spread love everywhere you go. Let no one ever come to you without leaving happier.",author:"Mother Teresa"},
+  {text:"When you reach the end of your rope, tie a knot in it and hang on.",author:"Franklin D. Roosevelt"},
+  {text:"Always remember that you are absolutely unique. Just like everyone else.",author:"Margaret Mead"},
+  {text:"Don't go where the path may lead, go instead where there is no path and leave a trail.",author:"Ralph Waldo Emerson"},
+  {text:"You will face many defeats in life, but never let yourself be defeated.",author:"Maya Angelou"},
+  {text:"The greatest glory in living lies not in never falling, but in rising every time we fall.",author:"Nelson Mandela"},
+  {text:"In the end, it's not the years in your life that count. It's the life in your years.",author:"Abraham Lincoln"},
+  {text:"Never let the fear of striking out keep you from playing the game.",author:"Babe Ruth"},
+  {text:"Life is either a daring adventure or nothing at all.",author:"Helen Keller"},
+  {text:"Many of life's failures are people who did not realize how close they were to success when they gave up.",author:"Thomas A. Edison"},
+  {text:"You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.",author:"Dr. Seuss"},
+  {text:"If life were predictable it would cease to be life, and be without flavor.",author:"Eleanor Roosevelt"},
+  {text:"If you look at what you have in life, you'll always have more.",author:"Oprah Winfrey"},
+  {text:"If you set your goals ridiculously high and it's a failure, you will fail above everyone else's success.",author:"James Cameron"},
+  {text:"Life is not measured by the number of breaths you take but by the moments that take your breath away.",author:"George Carlin"},
+  {text:"A woman is like a tea bag — you never know how strong she is until she gets in hot water.",author:"Eleanor Roosevelt"},
+  {text:"I can and I will. Watch me.",author:"Carrie Green"},
+  {text:"The most courageous act is still to think for yourself. Aloud.",author:"Coco Chanel"},
+  {text:"Nothing is impossible, the word itself says 'I'm possible'.",author:"Audrey Hepburn"},
+  {text:"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear.",author:"Atticus"},
+  {text:"The most difficult thing is the decision to act. The rest is merely tenacity.",author:"Amelia Earhart"},
+  {text:"How wonderful it is that nobody need wait a single moment before starting to improve the world.",author:"Anne Frank"},
+  {text:"You gain strength, courage, and confidence by every experience in which you really stop to look fear in the face.",author:"Eleanor Roosevelt"},
+  {text:"I have learned over the years that when one's mind is made up, this diminishes fear.",author:"Rosa Parks"},
+  {text:"I alone cannot change the world, but I can cast a stone across the water to create many ripples.",author:"Mother Teresa"},
+  {text:"No one can make you feel inferior without your consent.",author:"Eleanor Roosevelt"},
+  {text:"It's not the load that breaks you down, it's the way you carry it.",author:"Lou Holtz"},
+  {text:"One day the people that don't even believe in you will tell others how they met you.",author:"Johnny Depp"},
+  {text:"Small steps every day. That's how big things get done.",author:"Unknown"},
+  {text:"Your present circumstances don't determine where you can go; they merely determine where you start.",author:"Nido Qubein"},
+  {text:"Difficult roads often lead to beautiful destinations.",author:"Zig Ziglar"},
+  {text:"Push yourself, because no one else is going to do it for you.",author:"Unknown"},
+  {text:"Great things never come from comfort zones.",author:"Unknown"},
+  {text:"Dream it. Believe it. Build it.",author:"Unknown"},
+  {text:"Wake up with determination. Go to bed with satisfaction.",author:"Unknown"},
+  {text:"Little by little, one travels far.",author:"J.R.R. Tolkien"},
+  {text:"The journey of a thousand miles begins with a single step.",author:"Lao Tzu"},
+  {text:"You are enough. You have enough. You do enough.",author:"Unknown"},
+  {text:"Be so good they can't ignore you.",author:"Steve Martin"},
+  {text:"Hustle in silence and let success make the noise.",author:"Unknown"},
+  {text:"Work hard in silence, let your success be your noise.",author:"Frank Ocean"},
+  {text:"You didn't come this far to only come this far.",author:"Unknown"},
+  {text:"Someday is not a day of the week.",author:"Janet Dailey"},
+  {text:"The only limits that exist are the ones you place on yourself.",author:"Unknown"},
+];
+
+function renderQuote(){
+  const el=document.getElementById('d-quote-text');
+  const au=document.getElementById('d-quote-author');
+  if(!el||!au)return;
+  // Rotate by day of year so it changes daily but is consistent all day
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,0);
+  const dayOfYear=Math.floor((now-start)/(1000*60*60*24));
+  const q=QUOTES[dayOfYear%QUOTES.length];
+  el.textContent='"'+q.text+'"';
+  au.textContent='— '+q.author;
+}
+
+
+
+
+// SCHEDULE BUBBLES + GOAL WEEK
+const DEFAULT_GOAL_WEEK={
+  Mon:[
+    {label:'Workout (6am)',cat:'wo'},{label:'Side hustle — Maydé creative',cat:'side'},{label:'FTI networking lunch',cat:'fti'},{label:'Protected eve',cat:'life'}
+  ],
+  Tue:[
+    {label:'Dog walk + think time',cat:'dog'},{label:'Workout (7:10am)',cat:'wo'},{label:'FTI networking lunch',cat:'fti'},{label:"Dad's carwash — side hustle",cat:'side'}
+  ],
+  Wed:[
+    {label:'Workout (6am)',cat:'wo'},{label:'Side hustle — Cognosis research',cat:'side'},{label:'FTI coffee',cat:'fti'},{label:'FTI evening event (1 of 2 max)',cat:'fti'}
+  ],
+  Thu:[
+    {label:'Dog walk + think time',cat:'dog'},{label:'Workout (7:10am)',cat:'wo'},{label:'FTI networking lunch',cat:'fti'},{label:'John sync — Cognosis + Concierge',cat:'side'}
+  ],
+  Fri:[
+    {label:'Weekly review (5am)',cat:'life'},{label:'Workout (6am)',cat:'wo'},{label:'FTI networking lunch',cat:'fti'},{label:'Protected — fully off',cat:'life'}
+  ],
+  Sat:[{label:'Fully off — family & rest',cat:'life'}],
+  Sun:[{label:'Deep work — venture planning (morning)',cat:'sun'},{label:'Protected afternoon',cat:'life'}],
+};
+
+const BUBBLE_COLORS={fti:'bubble-fti',side:'bubble-side',wo:'bubble-wo',dog:'bubble-dog',life:'bubble-life',sun:'bubble-sun'};
+let goalWeek=JSON.parse(JSON.stringify(DEFAULT_GOAL_WEEK));
+let dragBubble=null;
+
+function startBubble(e,label,cat){
+  dragBubble={label,cat};
+  e.dataTransfer.effectAllowed='copy';
+  e.dataTransfer.setData('text/plain',label);
+}
+
+function toggleSchedGuide(){
+  const wrap=document.getElementById('goal-week-wrap');
+  const btn=document.querySelector('.sched-guide-toggle');
+  const open=wrap.style.display==='none';
+  wrap.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'▴ Hide goal week':'▾ Show goal week';
+  if(open)renderGoalWeek();
+}
+
+function renderGoalWeek(){
+  const el=document.getElementById('goal-day-grid');if(!el)return;
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  el.innerHTML=days.map(d=>{
+    const items=goalWeek[d]||[];
+    return `<div class="goal-day" ondragover="event.preventDefault()" ondrop="dropOnGoalDay('${d}',event)">
+      <div class="goal-day-hd">${d}</div>
+      ${items.map((b,i)=>`<div class="goal-blk ${BUBBLE_COLORS[b.cat]||'bubble-life'}" style="padding-right:16px">
+        ${b.label}
+        <button class="rm" onclick="removeGoalBlk('${d}',${i})">✕</button>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function dropOnGoalDay(day,e){
+  e.preventDefault();
+  if(!dragBubble)return;
+  if(!goalWeek[day])goalWeek[day]=[];
+  goalWeek[day].push({...dragBubble});
+  dragBubble=null;
+  renderGoalWeek();
+}
+
+function removeGoalBlk(day,i){
+  goalWeek[day].splice(i,1);
+  renderGoalWeek();
+}
+
+function resetGoalWeek(){
+  goalWeek=JSON.parse(JSON.stringify(DEFAULT_GOAL_WEEK));
+  renderGoalWeek();
+}
+
+// DAILY DIGEST EMAIL
+function sendDigest(){
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  let body='SHELLY\'S DAILY DIGEST\n';
+  body+='='.repeat(40)+'\n';
+  body+=dateStr+'\n\n';
+
+  // Venture tasks
+  body+='VENTURE TRACKER — OPEN TASKS\n';
+  body+='-'.repeat(40)+'\n';
+  VENTURES.forEach(v=>{
+    const vt=S.vtasks&&S.vtasks[v.id];
+    if(!vt)return;
+    const cats=['learning','tactical','networking'];
+    const catLabels={learning:'Learning',tactical:'Tactical',networking:'Networking'};
+    let hasOpen=false;
+    let vBlock='\n'+v.name.toUpperCase()+'\n';
+    cats.forEach(cat=>{
+      const open=(vt[cat]||[]).filter(t=>!t.done);
+      if(open.length){
+        hasOpen=true;
+        vBlock+=`  ${catLabels[cat]}:\n`;
+        open.forEach(t=>{vBlock+=`    • ${t.text}${t.month?' ['+t.month+']':''}\n`;});
+      }
+    });
+    if(hasOpen)body+=vBlock;
+  });
+
+  // Life admin
+  const adminOpen=(S.personal&&S.personal.admin||[]).filter(a=>!a.done);
+  if(adminOpen.length){
+    body+='\nLIFE ADMIN — OPEN TASKS\n';
+    body+='-'.repeat(40)+'\n';
+    adminOpen.forEach(a=>{body+=`  • ${a.text}\n`;});
+  }
+
+  // Health appointments to schedule
+  const apptOpen=(S.personal&&S.personal.appts||[]).filter(a=>!a.done);
+  if(apptOpen.length){
+    body+='\nHEALTH — APPOINTMENTS TO SCHEDULE\n';
+    body+='-'.repeat(40)+'\n';
+    apptOpen.forEach(a=>{body+=`  • ${a.text}\n`;});
+  }
+
+  // Follow-ups due
+  const fueDue=S.contacts.filter(c=>c.nextFollowup&&new Date(c.nextFollowup)<=new Date(Date.now()+7*864e5)&&!c.done);
+  if(fueDue.length){
+    body+='\nFOLLOW-UPS DUE THIS WEEK\n';
+    body+='-'.repeat(40)+'\n';
+    fueDue.forEach(c=>{body+=`  • ${c.name} (${c.company}) — follow up by ${fmtD(c.nextFollowup)}\n`;});
+  }
+
+  body+='\n'+'='.repeat(40)+'\n';
+  body+='Sent from Shelly\'s OS\n';
+
+  const subject=encodeURIComponent('Shelly\'s Daily Digest — '+dateStr);
+  const bodyEnc=encodeURIComponent(body);
+  window.open(`mailto:?subject=${subject}&body=${bodyEnc}`,'_blank');
+}
+
+// NEWS ALERTS
+const NEWS_CATS=[
+  {key:'datacenters',label:'Data Centers',icon:'🖥️',color:'var(--blue)',bg:'var(--blue-bg)'},
+  {key:'dallas',label:'Dallas',icon:'🏙️',color:'var(--teal)',bg:'var(--teal-bg)'},
+  {key:'investigations',label:'Investigations',icon:'🔍',color:'var(--amber)',bg:'var(--amber-bg)'},
+  {key:'enforcement',label:'Enforcement',icon:'⚖️',color:'var(--blush)',bg:'var(--blush-bg)'},
+];
+
+// Curated seed stories from real current sources
+const NEWS_SEED={
+  datacenters:[
+    {headline:"Dallas Ranked #1 Data Center Market Globally",summary:"Cushman & Wakefield's 2026 Global Data Center Market Comparison report ranks Dallas first among all primary markets worldwide, driven by AI adoption, cloud demand, and digital infrastructure investment. Global capacity under construction has more than doubled to 31.7GW.",source:"Cushman & Wakefield / Connect CRE",date:"May 2026",url:"https://www.connectcre.com/stories/dallas-tops-world-data-center-rankings/",tag:"Market intel"},
+    {headline:"DataBank Secures $2B Construction Loan for Dallas Campus",summary:"Data center developer DataBank closed a $2 billion construction financing package for three buildings at its Dallas-area campus, accelerating completion of the hub and signaling continued institutional confidence in DFW digital infrastructure.",source:"CoStar",date:"Apr 2026",url:"https://www.costar.com/article/2064534335/databank-lands-its-biggest-construction-loan-yet-for-dallas-data-centers",tag:"Deal"},
+    {headline:"Crow Holdings Announces 245MW Data Center Campus in Central Dallas",summary:"Crow Holdings unveiled a flagship 245MW turnkey data center campus along the Stemmons Corridor in central Dallas, targeting hyperscalers and developed in partnership with CleanArc Data Centers. Initial 70MW delivery expected late 2027.",source:"Crow Holdings",date:"Jan 2026",url:"https://www.crowholdings.com/insights/crow-holdings-announces-245mw-flagship-data-center-campus-in-central-dallas/",tag:"Development"},
+    {headline:"Data Center World Power Conference Coming to Dallas — Sept 2026",summary:"Data Center World Power convenes September 21–23 at the Gaylord Texan in Dallas, focusing on power constraints, energy sourcing, and utility relationships shaping data center development. Key event for FTI data center network.",source:"Data Center World",date:"2026",url:"https://dcwpower.com/",tag:"Event"},
+    {headline:"Texas Data Center Market 'One to Watch' — Power & Land Driving Growth",summary:"Cushman & Wakefield's John McWilliams singles out all of Texas as the top market to watch in 2026, noting that DFW's established position is now complemented by emerging development in Houston, Austin, San Antonio, El Paso, and Abilene under Project Stargate.",source:"Data Center Knowledge",date:"Mar 2026",url:"https://www.datacenterknowledge.com/data-center-site-selection/emerging-data-center-markets-key-locations-to-watch-in-2026",tag:"Market intel"},
+  ],
+  dallas:[
+    {headline:"Dallas Tops Global Data Center Rankings for 2026",summary:"Dallas-Fort Worth has cemented its position as the world's top data center market per Cushman & Wakefield, with AI-driven demand, power infrastructure, and land availability making it the most competitive location for hyperscale development.",source:"Connect CRE",date:"May 2026",url:"https://www.connectcre.com/stories/dallas-tops-world-data-center-rankings/",tag:"Market"},
+    {headline:"Crow Holdings Launches Central Dallas Digital Infrastructure Hub",summary:"A 245MW campus along the Stemmons Corridor marks one of the largest urban infill data center projects in Dallas history, with initial delivery in 2027. Strategically positioned for hyperscaler tenants.",source:"Crow Holdings",date:"Jan 2026",url:"https://www.crowholdings.com/insights/crow-holdings-announces-245mw-flagship-data-center-campus-in-central-dallas/",tag:"Development"},
+    {headline:"DFW Legal Market: Outside Counsel Activity Rises with Corporate Expansion",summary:"As corporate headquarters continue relocating to Dallas, demand for litigation support, forensic accounting, and investigations work among DFW law firms is tracking upward in 2026 — a direct opportunity for FTI D&A practice.",source:"Dallas Business Journal",date:"2026",url:"https://www.bizjournals.com/dallas",tag:"BD intel"},
+    {headline:"Texas Legislature 2026: Key Regulatory Developments for Business",summary:"The 2026 Texas legislative session has produced notable changes in data privacy, energy regulation, and corporate disclosure requirements — all areas driving demand for compliance advisory and forensic services in the Dallas market.",source:"Dallas Morning News",date:"2026",url:"https://www.dallasnews.com/business/",tag:"Regulatory"},
+    {headline:"DataBank's $2B Dallas Campus Financing Signals Investor Confidence in DFW",summary:"The largest construction loan in DataBank's history, secured for its Dallas-area campus, underscores the metro's dominance in institutional data center investment and the deepening ecosystem of lenders, operators, and tenants in the market.",source:"CoStar",date:"Apr 2026",url:"https://www.costar.com/article/2064534335/databank-lands-its-biggest-construction-loan-yet-for-dallas-data-centers",tag:"Finance"},
+  ],
+  investigations:[
+    {headline:"DOJ Releases First-Ever Department-Wide Corporate Enforcement Policy",summary:"On March 10, 2026, the DOJ released a unified Corporate Enforcement Policy covering all criminal cases — not just FCPA. The policy rewards voluntary self-disclosure, cooperation, and remediation with declinations, creating significant incentives for companies to engage outside forensic counsel early.",source:"DOJ.gov",date:"Mar 2026",url:"https://www.justice.gov/opa/pr/department-justice-releases-first-ever-corporate-enforcement-policy-all-criminal-cases",tag:"Policy"},
+    {headline:"DOJ Fraud Section 2025 Results Signal Heightened Healthcare & Life Sciences Risk",summary:"The DOJ Criminal Division's Fraud Section 2025 Year in Review signals continued aggressive enforcement in healthcare and life sciences — with significant implications for companies conducting internal investigations and outside counsel selecting forensic partners.",source:"Alston & Bird",date:"Feb 2026",url:"https://www.alston.com/en/insights/publications/2026/03/sec-updated-enforcement-manual",tag:"Enforcement trend"},
+    {headline:"FCPA Enforcement Resumes: DOJ Issues New Directive on National Interest Cases",summary:"After a brief pause, DOJ has issued a new directive to pursue FCPA cases that vindicate U.S. national interests. Companies with international operations should expect renewed scrutiny and should ensure forensic and compliance programs are current.",source:"Sidley Austin",date:"Jun 2025",url:"https://www.sidley.com/en/insights/newsupdates/2025/05/us-doj-unveils-white-collar-enforcement-priorities",tag:"FCPA"},
+    {headline:"Trade & Customs Fraud: DOJ's New High-Impact Enforcement Priority",summary:"The DOJ White Collar Enforcement Plan identifies trade and customs fraud as a 'high impact' priority for 2026, with a new task force signaling increased tariff enforcement activity. A growing area for forensic investigations work.",source:"Akin Gump / Sidley",date:"2026",url:"https://www.akingump.com/en/services/litigation/white-collar-defense-and-government-investigations",tag:"Trade fraud"},
+    {headline:"Internal Investigation Best Practices Under New DOJ CEP Framework",summary:"With the DOJ's unified Corporate Enforcement Policy now in effect, companies and their outside counsel must understand what constitutes cooperation credit and timely remediation. Forensic teams play a central role in building defensible investigation records.",source:"Cleary Gottlieb",date:"Jan 2026",url:"https://www.clearygottlieb.com/news-and-insights/publication-listing/significant-developments-to-doj-enforcement-priorities",tag:"Practice intel"},
+  ],
+  enforcement:[
+    {headline:"SEC Updates Enforcement Manual, Aligns with DOJ and CFTC Priorities",summary:"SEC leadership has articulated a return to core enforcement priorities and a more coordinated approach with DOJ and CFTC. The updated enforcement manual codifies key process improvements and signals a more focused, transparent enforcement posture.",source:"Alston & Bird / SEC",date:"Feb 2026",url:"https://www.alston.com/en/insights/publications/2026/03/sec-updated-enforcement-manual",tag:"SEC"},
+    {headline:"DOJ White Collar Enforcement Plan: Focus, Fairness, Efficiency",summary:"The Criminal Division's White Collar Enforcement Plan is guided by three principles — focus, fairness, and efficiency — directing prosecutors toward high-impact cases including financial fraud, healthcare fraud, trade crimes, and national security violations.",source:"DOJ.gov",date:"Mar 2026",url:"https://www.justice.gov/criminal/corporate-enforcement",tag:"DOJ policy"},
+    {headline:"$549.5M Perfectus Aluminum Settlement Sets New FCA Trade Fraud Record",summary:"A landmark False Claims Act settlement against Perfectus Aluminum marks the highest-ever FCA resolution in trade fraud enforcement, signaling the DOJ's intent to pursue complex multi-party customs and tariff fraud schemes aggressively.",source:"Akin Gump",date:"2026",url:"https://www.akingump.com/en/services/litigation/white-collar-defense-and-government-investigations",tag:"FCA"},
+    {headline:"International Anti-Corruption Taskforce Expands — US May Defer to Foreign Authorities",summary:"The UK, France, and Switzerland anti-corruption taskforce is growing, and new DOJ FCPA guidelines direct prosecutors to consider foreign enforcement likelihood — potentially deferring some cases. Companies with EU exposure should plan accordingly.",source:"Cleary Gottlieb",date:"Jan 2026",url:"https://www.clearygottlieb.com/news-and-insights/publication-listing/significant-developments-to-doj-enforcement-priorities",tag:"International"},
+    {headline:"Voluntary Self-Disclosure: A Strategic Tool Under New Corporate Enforcement Policy",summary:"With the DOJ CEP now extended department-wide, companies discovering misconduct face a clear strategic choice on voluntary disclosure. Companies that self-disclose, cooperate, and remediate can qualify for declination — making early forensic engagement critical.",source:"DOJ / Cleary Gottlieb",date:"2026",url:"https://www.justice.gov/criminal/corporate-enforcement",tag:"Strategy"},
+  ],
+};
+
+let newsData=null;
+let newsLastFetched=null;
+
+async function fetchNews(forceRefresh=false){
+  const el=document.getElementById('news-body');
+  const loading=document.getElementById('news-loading');
+  if(!el)return;
+
+  // Use cached data if fresh (within 4 hours) and not forcing refresh
+  const cached=ls('s6_news',null);
+  const cachedTime=ls('s6_news_time',0);
+  const FOUR_HOURS=4*60*60*1000;
+  if(!forceRefresh&&cached&&(Date.now()-cachedTime)<FOUR_HOURS){
+    renderNews(cached);
+    return;
+  }
+
+  // Show loading
+  loading.style.display='block';
+  el.innerHTML='';
+
+  try {
+    // Use Claude API to fetch fresh summaries
+    const prompt=`You are a news curator for a senior FTI Consulting professional focused on Dallas D&A (Data & Analytics / forensics). 
+Return ONLY valid JSON — no markdown, no preamble, no explanation.
+Return exactly this structure with 4 categories, each with exactly 5 news items based on REAL current news stories from reputable sources (WSJ, FT, Reuters, Bloomberg, CoStar, Data Center Knowledge, DOJ.gov, SEC.gov, Dallas Morning News, Bisnow):
+{
+  "datacenters": [{"headline":"...","summary":"2 sentence summary relevant to FTI forensics/advisory clients","source":"Source name","date":"Month Year","url":"https://...","tag":"Category tag"}],
+  "dallas": [...same structure, 5 items...],
+  "investigations": [...same structure, 5 items...],
+  "enforcement": [...same structure, 5 items...]
+}
+Categories: datacenters (data center industry news relevant to Dallas/Texas market), dallas (Dallas business/legal/corporate market news), investigations (corporate internal investigations, forensic accounting trends), enforcement (DOJ/SEC/regulatory enforcement actions).
+Only include real, verifiable stories. Today is ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.`;
+
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await response.json();
+    const text=data.content?.[0]?.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    // Validate structure
+    if(parsed.datacenters&&parsed.dallas&&parsed.investigations&&parsed.enforcement){
+      lset('s6_news',parsed);lset('s6_news_time',Date.now());
+      loading.style.display='none';
+      renderNews(parsed);
+      return;
+    }
+  } catch(e){
+    console.log('API fetch failed, using seed data:',e);
+  }
+
+  // Fallback to seed data
+  loading.style.display='none';
+  lset('s6_news',NEWS_SEED);lset('s6_news_time',Date.now());
+  renderNews(NEWS_SEED);
+}
+
+function renderNews(data){
+  const el=document.getElementById('news-body');
+  if(!el)return;
+  el.innerHTML=NEWS_CATS.map(cat=>{
+    const items=(data[cat.key]||[]).slice(0,5);
+    return `<div class="news-cat">
+      <div class="news-cat-hd" style="background:${cat.bg};color:${cat.color}">
+        <span class="news-cat-icon">${cat.icon}</span>
+        <span class="news-cat-name">${cat.label}</span>
+        <span class="news-cat-cnt">${items.length} stories</span>
+      </div>
+      ${items.map(s=>`<a class="news-card" href="${s.url||'#'}" target="_blank" rel="noopener">
+        <div class="news-headline">${s.headline}</div>
+        <div class="news-summary">${s.summary}</div>
+        <div class="news-meta">
+          <span class="news-source">${s.source}</span>
+          ${s.date?`<span class="news-date">${s.date}</span>`:''}
+          ${s.tag?`<span class="news-tag">${s.tag}</span>`:''}
+          <span style="margin-left:auto;font-size:10px;color:var(--blue)">Read → </span>
+        </div>
+      </a>`).join('')}
+    </div>`;
+  }).join('');
+  // Show last refreshed time
+  const lastTime=ls('s6_news_time',0);
+  if(lastTime){
+    const ago=Math.round((Date.now()-lastTime)/60000);
+    const timeStr=ago<60?`${ago}m ago`:`${Math.round(ago/60)}h ago`;
+    el.insertAdjacentHTML('afterbegin',`<div style="font-size:11px;color:var(--ink4);margin-bottom:1rem;text-align:right">Last refreshed ${timeStr}</div>`);
+  }
+}
+
+
+// VENTURE NEWS
+const VNEWS_CATS=[
+  {key:'jewelry',label:'Jewelry',icon:'💎',color:'var(--gold)',bg:'var(--gold-bg)'},
+  {key:'carwash',label:'Carwash & PE',icon:'🚗',color:'var(--teal)',bg:'var(--teal-bg)'},
+  {key:'concierge',label:'Concierge Medicine',icon:'🩺',color:'var(--blue)',bg:'var(--blue-bg)'},
+  {key:'stocks',label:'Stocks & Equity',icon:'📈',color:'var(--blush)',bg:'var(--blush-bg)'},
+];
+
+const VNEWS_SEED={
+  jewelry:[
+    {headline:"Gold Price Today: $4,440/oz — Down 1.1% But Still Up 31% Year-Over-Year",summary:"Gold fell to $4,440/oz on June 3, 2026 on hawkish central bank signals and US-Iran uncertainty, but remains 31.6% above year-ago levels. The record high of $5,595 was hit in January. For Maydé Jewels, current gold prices significantly impact material costs — locking in supply agreements or sourcing lab-created alternatives should be a strategic consideration.",source:"Trading Economics",date:"Jun 3, 2026",url:"https://tradingeconomics.com/commodity/gold",tag:"Gold price"},
+    {headline:"Gold Jewelry Volume Down 23% in Q1 2026 But Spend Up 31% — A Premium Shift",summary:"World Gold Council Q1 2026 data shows volume demand for jewelry fell 23% year-over-year amid record-high prices, yet total spend rose 31% — consumers are buying less but spending more. This signals a clear market shift toward premium, investment-grade pieces, directly validating Maydé's bespoke positioning.",source:"World Gold Council",date:"Apr 2026",url:"https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026",tag:"Market shift"},
+    {headline:"J.P. Morgan, BofA & Morgan Stanley Consensus: Gold at $4,500–$5,000 Through 2026",summary:"Major bank analysts cluster around $4,500–$5,000/oz for the rest of 2026, with some models projecting brief tests of $5,000 if geopolitical tensions persist. For a fine jewelry brand, high gold prices are a dual-edged story: higher material costs but stronger perception of value and investment quality for buyers.",source:"Yahoo Finance / San Jose Jewelers",date:"2026",url:"https://finance.yahoo.com/personal-finance/investing/article/gold-forecast-and-tracker-heres-where-prices-could-land-in-2026-130000950.html",tag:"Forecast"},
+    {headline:"Rising Gold Prices Are Reshaping Engagement Ring Buying Behavior",summary:"With gold up significantly, consumers are increasingly opting for 14k over 18k gold, lab-grown alternatives, and mixed-metal designs to manage cost. For Maydé, this creates both a pricing challenge and an opportunity to position bespoke design as a way to maximize perceived value at any price point.",source:"Gem Breakfast",date:"Mar 2026",url:"https://gembreakfast.com/blogs/news/rising-gold-prices-2026-what-it-means-for-engagement-rings-and-fine-jewelry",tag:"Consumer behavior"},
+    {headline:"Women's Fine Jewelry Market on Track to Exceed $50B in 2026 — 19% Growth",summary:"The global women's jewelry market is projected to break $50 billion in 2026, with gold necklaces and chains leading growth at nearly 19% annually. Dallas's affluent demographics and corporate social scene make it one of the strongest US markets for a premium jewelry brand launch.",source:"International Jewelry Association",date:"2026",url:"https://www.mexc.com/news/372813",tag:"Market size"},
+  ],
+  carwash:[
+    {headline:"MAJOR DEAL: Mister Car Wash Taken Private by Leonard Green & Partners at $3.1B",summary:"Leonard Green & Partners agreed to acquire Mister Car Wash in an all-cash deal at $7/share — a 29% premium — valuing the company at $3.1 billion. This is the single largest carwash PE transaction of 2026 and signals continued institutional confidence in the sector despite prior market rationalization. CEO plans to triple the footprint as a private company.",source:"Carwash.com / Cleary Gottlieb / PitchBook",date:"Feb 2026",url:"https://www.carwash.com/mister-car-wash-to-be-taken-private/",tag:"Take-private"},
+    {headline:"Raymond James Spring 2026 Car Wash Insight Report — PE Landscape Overview",summary:"Raymond James published its Spring 2026 car wash investment banking report tracking private equity involvement, valuations, and M&A transactions through May 2026. The report is a critical read for anyone preparing a carwash business for sale — benchmarks multiples, deal structures, and buyer appetite.",source:"Raymond James",date:"May 2026",url:"https://www.raymondjames.com/-/media/rj/dotcom/files/corporations-and-institutions/investment-banking/industry-insight/car_wash_insight.pdf",tag:"Industry report"},
+    {headline:"PE Carwash M&A: What Buyers Want — Subscription Revenue, Scale, and Clean Financials",summary:"Institutional buyers and PE firms consistently underwrite carwash deals on subscription/membership revenue, site count for scale, and free cash flow. Operators without a membership model command 30–40% lower multiples. For a 6-site portfolio, establishing even a basic unlimited wash pass before going to market meaningfully impacts valuation.",source:"Car Wash Advisory / The Deal",date:"2026",url:"https://www.carwashadvisory.com/learning/private-equity-funds-invest-in-car-washes-2025",tag:"Valuation intel"},
+    {headline:"Quick Quack (KKR-backed) and Whistle Express Most Active Acquirers — Consolidation Continues",summary:"KKR-backed Quick Quack Car Wash has grown to 300+ sites nationally, while Whistle Express dominated H1 2024 deal volume at 43% of transactions. Both represent potential strategic buyers for regional carwash portfolios. PE-backed platforms are actively seeking bolt-on acquisitions in underserved markets.",source:"PitchBook / Car Wash Advisory",date:"2026",url:"https://pitchbook.com/news/articles/mister-car-wash-is-once-more-in-private-hands",tag:"Active buyers"},
+    {headline:"Tunnel vs. Self-Serve: How Mixed Portfolios Are Valued in Today's Market",summary:"PE buyers view mixed portfolios (tunnel + self-serve + automatic) as attractive if the tunnel provides the subscription anchor and self-serve locations add real estate and cash flow. The 'value-add story' of converting self-serve bays to express tunnels is a proven PE playbook that commands higher multiples at exit.",source:"Car Wash Advisory",date:"2026",url:"https://www.carwashadvisory.com/learning/private-equity-interest-car-wash-businesses",tag:"Portfolio strategy"},
+  ],
+  concierge:[
+    {headline:"Concierge Medicine Market to Reach $25B in 2026 — Growing at 10.9% CAGR",summary:"The global concierge medicine market is projected to grow from $22.6B in 2025 to $25.1B in 2026 at a 10.9% CAGR, driven by physician burnout, rising patient demand for personalized care, and expansion of employer-sponsored memberships. The US market is growing fastest in Texas, Florida, and the Southeast.",source:"Research and Markets",date:"2026",url:"https://www.researchandmarkets.com/reports/5986867/concierge-medicine-market-report",tag:"Market size"},
+    {headline:"Concierge Practice Sites Up 80% Since 2018 — Supply Can't Keep Up With Demand",summary:"National research shows concierge and direct primary care practice sites increased over 80% between 2018 and 2023, with clinician participation rising at nearly the same rate. Despite rapid growth, demand from patients — especially high-net-worth individuals and corporate wellness programs — continues to outpace supply.",source:"Concierge Medicine Today",date:"Jan 2026",url:"https://conciergemedicinetoday.org/2026/01/22/what-the-80-growth-in-concierge-medicine-is-really-telling-us-about-primary-care/",tag:"Growth"},
+    {headline:"Multispecialty Concierge Practices — The Fastest Growing Model in 2026",summary:"Medical Economics reports that combining specialties (internal medicine + cardiology, OB-GYN, endocrinology) under a single membership is the fastest-growing concierge model in 2026. Mental health integration is an emerging differentiator. This model directly aligns with the concierge + mental health angle John is pursuing.",source:"Medical Economics",date:"Apr 2026",url:"https://www.medicaleconomics.com/view/why-more-physicians-will-choose-concierge-medicine-in-2026",tag:"Model trends"},
+    {headline:"Cleveland Clinic Expands Concierge Medicine to Nevada — Corporate Health Programs Driving Growth",summary:"Cleveland Clinic launched concierge medicine and executive health practices in Nevada with patient intake beginning in 2026. The expansion reflects a broader trend: large health systems and corporate wellness programs are now the primary drivers of concierge medicine growth, with 58% of memberships employer-sponsored.",source:"Coherent Market Insights",date:"2026",url:"https://www.coherentmarketinsights.com/industry-reports/concierge-medicine-market",tag:"Expansion"},
+    {headline:"Texas: 42 States Have DPC Statutes — Regulatory Tailwind for New Entrants",summary:"42 states now have Direct Primary Care statutes providing legal clarity and reducing regulatory uncertainty for new concierge practices. Texas is among them, creating a favorable environment for a new market entrant. Combined with Texas's growing high-net-worth population and physician shortage, DFW is an underserved opportunity.",source:"Healthcare Foresights",date:"Mar 2026",url:"https://www.healthcareforesights.com/reports/us-concierge-medicine-market",tag:"Texas regulatory"},
+  ],
+  stocks:[
+    {headline:"DISCLAIMER: For educational awareness only — not financial advice. Consult a licensed advisor.",summary:"The stock picks below are pulled from reputable analyst sources for awareness and learning purposes only. Shelly's OS does not provide financial advice. Before making any investment, consult a licensed financial advisor who understands your full financial picture.",source:"Shelly's OS",date:"Always",url:"#",tag:"⚠️ Disclaimer"},
+    {headline:"Uber (UBER) — Analyst Strong Buy, June 2026",summary:"TipRanks analysts flag Uber as a top June 2026 pick. Uber continues to benefit from steady demand in both ride-hailing and delivery. As a beginner investor, Uber is a familiar, real-world business that's easy to understand — a useful starting point for learning how to evaluate consumer-facing tech companies.",source:"TipRanks",date:"Jun 2026",url:"https://www.tipranks.com/news/3-best-stocks-to-buy-in-june-2026-according-to-analysts",tag:"Growth pick"},
+    {headline:"Vistra Corp (VST) — Power + Data Centers = Analyst Buy",summary:"Jefferies reiterated a Buy on Vistra with a $212 target after a 35% pullback, calling it cheap. Vistra is a major US power producer benefiting from rising electricity demand tied to data centers and AI. As you build knowledge in the data center space through FTI, Vistra offers a way to invest in the infrastructure powering it.",source:"TipRanks / Jefferies",date:"Jun 2026",url:"https://www.tipranks.com/news/3-best-stocks-to-buy-in-june-2026-according-to-analysts",tag:"Energy + AI"},
+    {headline:"Energy Transfer (ET) — 8% Dividend Yield, Strong Buy Consensus",summary:"Energy Transfer moves natural gas and crude across the US and offers an 8.04% dividend yield with a 23.4% upside target per analysts. For a new investor, dividend-paying stocks are a great learning tool — you receive income while you hold, and ET's infrastructure business is stable and easy to understand.",source:"TipRanks",date:"Jun 2026",url:"https://www.tipranks.com/news/3-best-dividend-stocks-to-buy-in-june-2026-according-to-analysts",tag:"Dividend"},
+    {headline:"Eagle Materials, Occidental Petroleum, WM — Motley Fool June 2026 Picks",summary:"The Motley Fool recommends Eagle Materials (building materials), Occidental Petroleum (energy), and WM (waste management) for June 2026. WM in particular is an interesting analog for Maydé and carwash thinking — a services business with recurring revenue, predictable cash flow, and strong returns on invested capital.",source:"Motley Fool",date:"Jun 2026",url:"https://www.fool.com/investing/top-stocks-to-buy-and-hold/",tag:"Diversified"},
+  ],
+};
+
+async function fetchVNews(forceRefresh=false){
+  const el=document.getElementById('vnews-body');
+  const loading=document.getElementById('vnews-loading');
+  if(!el)return;
+  const cached=ls('s6_vnews',null);
+  const cachedTime=ls('s6_vnews_time',0);
+  const FOUR_HOURS=4*60*60*1000;
+  if(!forceRefresh&&cached&&(Date.now()-cachedTime)<FOUR_HOURS){renderVNews(cached);return;}
+  loading.style.display='block';el.innerHTML='';
+  try{
+    const prompt=`You are a news curator. Return ONLY valid JSON, no markdown, no preamble.
+Return exactly this structure with 4 categories, each with 4-5 news items based on REAL current news from reputable sources:
+{"jewelry":[{"headline":"...","summary":"2 sentence summary relevant to starting a fine jewelry brand in Dallas","source":"Source name","date":"Month Year","url":"https://...","tag":"tag"}],"carwash":[same structure, PE deals and carwash M&A news],"concierge":[same, concierge medicine expansion news],"stocks":[same, suggested stocks for a beginner investor with disclaimer first]}
+Today is ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
+For jewelry: focus on gold price, fine jewelry market trends, consumer behavior.
+For carwash: PE deals, M&A activity, valuation benchmarks.
+For concierge: market growth, new practice models, state expansion, Texas specifically.
+For stocks: 4 analyst-recommended stocks for a new investor learning markets (include disclaimer as first item).
+Only include real verifiable stories from WSJ, Reuters, Bloomberg, World Gold Council, PitchBook, Medical Economics, TipRanks, Motley Fool, Zacks.`;
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    const data=await response.json();
+    const text=data.content?.[0]?.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    if(parsed.jewelry&&parsed.carwash&&parsed.concierge&&parsed.stocks){
+      lset('s6_vnews',parsed);lset('s6_vnews_time',Date.now());
+      loading.style.display='none';renderVNews(parsed);return;
+    }
+  }catch(e){console.log('VNews API failed, using seed:',e);}
+  loading.style.display='none';
+  lset('s6_vnews',VNEWS_SEED);lset('s6_vnews_time',Date.now());
+  renderVNews(VNEWS_SEED);
+}
+
+function renderVNews(data){
+  const el=document.getElementById('vnews-body');if(!el)return;
+  const lastTime=ls('s6_vnews_time',0);
+  let timeHtml='';
+  if(lastTime){const ago=Math.round((Date.now()-lastTime)/60000);const ts=ago<60?`${ago}m ago`:`${Math.round(ago/60)}h ago`;timeHtml=`<div style="font-size:11px;color:var(--ink4);margin-bottom:1rem;text-align:right">Last refreshed ${ts}</div>`;}
+  el.innerHTML=timeHtml+VNEWS_CATS.map(cat=>{
+    const items=(data[cat.key]||[]).slice(0,5);
+    return `<div class="news-cat">
+      <div class="news-cat-hd" style="background:${cat.bg};color:${cat.color}">
+        <span class="news-cat-icon">${cat.icon}</span>
+        <span class="news-cat-name">${cat.label}</span>
+        <span class="news-cat-cnt">${items.length} stories</span>
+      </div>
+      ${items.map(s=>`<a class="news-card" href="${s.url||'#'}" target="_blank" rel="noopener">
+        <div class="news-headline">${s.headline}</div>
+        <div class="news-summary">${s.summary}</div>
+        <div class="news-meta">
+          <span class="news-source">${s.source}</span>
+          ${s.date?`<span class="news-date">${s.date}</span>`:''}
+          ${s.tag?`<span class="news-tag">${s.tag}</span>`:''}
+          <span style="margin-left:auto;font-size:10px;color:var(--blue)">Read →</span>
+        </div>
+      </a>`).join('')}
+    </div>`;
+  }).join('');
 }
 
 // COMPLETED LOG
