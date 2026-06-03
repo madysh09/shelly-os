@@ -557,6 +557,38 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
   </div>
 </div>
 
+<!-- CALENDAR BLOCK ADD MODAL (triggered by bubble drop) -->
+<div id="blk-modal" style="display:none;position:fixed;inset:0;background:rgba(24,24,15,.55);z-index:600;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:var(--rx);padding:2rem;width:100%;max-width:420px;position:relative">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:4px" id="blk-modal-title">Add block</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:1.25rem" id="blk-modal-sub"></div>
+    <div style="display:grid;gap:12px">
+      <div><label>Date</label><input id="bm-date" type="date"></div>
+      <div class="g2">
+        <div><label>Start time</label><input id="bm-time" type="text" placeholder="e.g. 7:00am"></div>
+        <div><label>End time (optional)</label><input id="bm-end" type="text" placeholder="e.g. 8:00am"></div>
+      </div>
+      <div><label>Label</label><input id="bm-label" type="text" placeholder="Block label"></div>
+      <div><label>Location (optional)</label><input id="bm-loc" type="text" placeholder="e.g. Pappas Brothers, Zoom, office…"></div>
+      <div><label>Notes (optional)</label><input id="bm-notes" type="text" placeholder="Any details…"></div>
+      <div><label>Type</label>
+        <select id="bm-cat">
+          <option value="fti">FTI networking</option>
+          <option value="side">Side hustle</option>
+          <option value="wo">Workout</option>
+          <option value="dog">Dog walk</option>
+          <option value="life">Protected</option>
+          <option value="sun">Deep work</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:1.25rem">
+      <button class="btn btn-p" onclick="saveBlkModal()" style="flex:1">Add to calendar</button>
+      <button class="btn" onclick="closeBlkModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sb">
   <div class="sb-brand"><div class="sb-title">Shelly's OS</div><div class="sb-sub">Command Center · 2026</div></div>
@@ -1453,7 +1485,7 @@ function renderMoCal(){
     const it=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
     const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const blks=S.cal.filter(b=>b.date===ds);
-    h+=`<div class="cal-day${it?' today':''}" onclick="document.getElementById('blk-dt').value='${ds}'"><div class="cal-dn">${d}</div>${blks.map(b=>`<div class="cal-ev ${CAT_CSS[b.cat]||'ev-life'}">${b.time?b.time+' ':''}${b.label}</div>`).join('')}</div>`;
+    h+=`<div class="cal-day${it?' today':''}" onclick="document.getElementById('blk-dt').value='${ds}'" ondragover="event.preventDefault()" ondrop="calDayDrop('${ds}',event)"><div class="cal-dn">${d}</div>${blks.map(b=>`<div class="cal-ev ${CAT_CSS[b.cat]||'ev-life'}">${b.time?b.time+' ':''}${b.label}</div>`).join('')}</div>`;
   }
   const rem=42-sd-dim;for(let i=1;i<=rem;i++)h+=`<div class="cal-day om"><div class="cal-dn">${i}</div></div>`;
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
@@ -1466,7 +1498,7 @@ function renderWkCal(){
     const d=new Date(mon);d.setDate(mon.getDate()+i);
     const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const it=d.toDateString()===today.toDateString(),blks=S.cal.filter(b=>b.date===ds);
-    h+=`<div class="wk-col${it?' today-col':''}"><div class="wk-hd"><div class="wk-dy">${days[i]}</div><div class="wk-dt">${d.getDate()}</div></div><div class="wk-blks">${blks.length?blks.map((b)=>{const gi=S.cal.findIndex(x=>x.date===ds&&x.label===b.label&&x.time===b.time);const col=CAT_COLORS[b.cat]||'#888780';return `<div class="wk-blk" style="background:${col}18;border-left:2px solid ${col}"><div class="blk-tm" style="color:${col}">${b.time||''}</div><div class="blk-lb" style="color:${col}">${b.label}</div><button class="blk-x" onclick="event.stopPropagation();delBlk(${gi})">✕</button></div>`}).join(''):'<div style="font-size:10px;color:var(--ink5);padding:4px 2px">Free</div>'}</div></div>`;
+    h+=`<div class="wk-col${it?' today-col':''}" ondragover="event.preventDefault()" ondrop="calDayDrop('${ds}',event)"><div class="wk-hd"><div class="wk-dy">${days[i]}</div><div class="wk-dt">${d.getDate()}</div></div><div class="wk-blks">${blks.length?blks.map((b)=>{const gi=S.cal.findIndex(x=>x.date===ds&&x.label===b.label&&x.time===b.time);const col=CAT_COLORS[b.cat]||'#888780';return `<div class="wk-blk" style="background:${col}18;border-left:2px solid ${col}"><div class="blk-tm" style="color:${col}">${b.time||''}</div><div class="blk-lb" style="color:${col}">${b.label}</div>${b.location?`<div style="font-size:9px;color:${col};opacity:.7;margin-top:1px">📍 ${b.location}</div>`:''}<button class="blk-x" onclick="event.stopPropagation();delBlk(${gi})">✕</button></div>`}).join(''):'<div style="font-size:10px;color:var(--ink5);padding:4px 2px">Free</div>'}</div></div>`;
   }
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
@@ -1476,7 +1508,7 @@ function addBlk(){
   const date=document.getElementById('blk-dt').value,time=document.getElementById('blk-tm').value.trim(),label=document.getElementById('blk-lb').value.trim(),cat=document.getElementById('blk-ct').value;
   if(!date||!label)return toast('Enter a date and label');
   const blkId=Date.now();
-  S.cal.push({date,time,label,cat,id:blkId});lset('s6_cal',S.cal);
+  S.cal.push({date,time,label,cat,location:'',notes:'',id:blkId});lset('s6_cal',S.cal);
   // Auto-draft FTI blocks into activity log
   if(cat==='fti'){
     if(!S.actDrafts)S.actDrafts=[];
@@ -1991,6 +2023,55 @@ function startBubble(e,label,cat){
   dragBubble={label,cat};
   e.dataTransfer.effectAllowed='copy';
   e.dataTransfer.setData('text/plain',label);
+}
+
+function openBlkModal(date,label,cat){
+  document.getElementById('bm-date').value=date||new Date().toISOString().split('T')[0];
+  document.getElementById('bm-label').value=label||'';
+  document.getElementById('bm-time').value='';
+  document.getElementById('bm-end').value='';
+  document.getElementById('bm-loc').value='';
+  document.getElementById('bm-notes').value='';
+  const sel=document.getElementById('bm-cat');
+  for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===cat){sel.selectedIndex=i;break;}}
+  document.getElementById('blk-modal-title').textContent=label||'Add block';
+  document.getElementById('blk-modal-sub').textContent=date?'Dropping onto '+new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}):'';
+  document.getElementById('blk-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('bm-time').focus(),100);
+}
+
+function closeBlkModal(){document.getElementById('blk-modal').style.display='none';dragBubble=null;}
+
+function calDayDrop(dateStr,e){
+  e.preventDefault();
+  const label=dragBubble?dragBubble.label:(e.dataTransfer.getData('text/plain')||'');
+  const cat=dragBubble?dragBubble.cat:'life';
+  openBlkModal(dateStr,label,cat);
+}
+
+function saveBlkModal(){
+  const date=document.getElementById('bm-date').value;
+  const t1=document.getElementById('bm-time').value.trim();
+  const t2=document.getElementById('bm-end').value.trim();
+  const label=document.getElementById('bm-label').value.trim();
+  const loc=document.getElementById('bm-loc').value.trim();
+  const notes=document.getElementById('bm-notes').value.trim();
+  const cat=document.getElementById('bm-cat').value;
+  if(!date||!label)return toast('Please enter a date and label');
+  const timeStr=t1&&t2?t1+'–'+t2:t1||'';
+  const blkId=Date.now();
+  S.cal.push({date,time:timeStr,label,cat,location:loc,notes,id:blkId});
+  lset('s6_cal',S.cal);
+  // Auto-draft FTI blocks into activity log
+  if(cat==='fti'){
+    if(!S.actDrafts)S.actDrafts=[];
+    const mo=new Date(date+'T12:00:00').toLocaleString('en-US',{month:'short'});
+    S.actDrafts.push({id:Date.now()+1,calId:blkId,label,date,month:mo,cat:'Law Firm Outreach',notes:'',confirmed:false});
+    lset('s6_drafts',S.actDrafts);
+  }
+  closeBlkModal();
+  renderCal();
+  toast('Added to calendar ✓');
 }
 
 function toggleSchedGuide(){
@@ -2532,7 +2613,7 @@ init();
 // ═══════════════════════════════════
 // PIN LOCK
 // ═══════════════════════════════════
-const DEFAULT_PIN = '1234'; // Change this to your preferred default
+const DEFAULT_PIN = '0509'; // Change this to your preferred default
 let pinBuffer = '';
 let pinUnlocked = false;
 
