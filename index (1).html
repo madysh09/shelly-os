@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shelly's OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#18180f;--ink2:#2e2e22;--ink3:#6b6b58;--ink4:#a8a890;--ink5:#d4d4c0;--parch:#f8f6f0;--parch2:#f0ece2;--parch3:#e4dfd2;--parch4:#d8d2c4;--gold:#b8923a;--gold2:#d4ab52;--gold3:#e8c878;--gold-bg:#fdf6e8;--gold-bd:#e8d4a0;--blush:#c44f78;--blush-bg:#fdf0f5;--blush-bd:#f0c0d4;--teal:#1a8a65;--teal-bg:#eef8f4;--teal-bd:#a8dcc8;--blue:#2a72b8;--blue-bg:#eef4fc;--blue-bd:#a8c8ec;--amber:#a86820;--amber-bg:#fdf4e8;--amber-bd:#e8c898;--danger:#b83028;--danger-bg:#fdf0ef;--r:12px;--rs:8px;--rx:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--parch);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.sb{position:fixed;top:0;left:0;bottom:0;width:228px;background:var(--ink);display:flex;flex-direction:column;z-index:200}
+.sb-brand{padding:1.75rem 1.5rem 1.5rem;border-bottom:.5px solid rgba(255,255,255,.06)}
+.sb-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--gold2);letter-spacing:.02em;line-height:1.1}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.22);margin-top:4px;letter-spacing:.12em;text-transform:uppercase}
+.sb-nav{flex:1;padding:.75rem 0;overflow-y:auto}
+.sb-sec{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.18);padding:.9rem 1.5rem .35rem;font-weight:500}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 1.5rem;font-size:12.5px;color:rgba(255,255,255,.42);cursor:pointer;transition:all .15s;border-left:2px solid transparent;user-select:none}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-item:hover{color:rgba(255,255,255,.82);background:rgba(255,255,255,.04)}
+.sb-item.on{color:var(--gold2);border-left-color:var(--gold);background:rgba(184,146,58,.1)}
+.sb-foot{padding:1rem 1.5rem;border-top:.5px solid rgba(255,255,255,.06);font-size:10px;color:rgba(255,255,255,.18)}
+.sb-pip{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-right:5px;vertical-align:middle}
+.main{margin-left:228px;flex:1;padding:2rem 2.5rem;max-width:1100px}
+.view{display:none}.view.on{display:block}
+.pg-hd{margin-bottom:1.75rem}
+.pg-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:500;color:var(--ink);line-height:1.15;letter-spacing:.01em}
+.pg-sub{font-size:13px;color:var(--ink3);margin-top:3px}
+.pg-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.75rem}
+.stat{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--ink);line-height:1}
+.stat-l{font-size:10px;color:var(--ink3);margin-top:5px;text-transform:uppercase;letter-spacing:.08em}
+.stat-d{font-size:11px;color:var(--teal);margin-top:3px}
+.card{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:18px 20px;margin-bottom:10px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--ink)}
+.card-sub{font-size:12px;color:var(--ink3);margin-top:1px}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 9px;border-radius:99px;letter-spacing:.04em;white-space:nowrap}
+.b-gold{background:var(--gold-bg);color:var(--gold);border:.5px solid var(--gold-bd)}
+.b-silver{background:var(--parch2);color:var(--ink3);border:.5px solid var(--parch3)}
+.b-bronze{background:var(--amber-bg);color:var(--amber);border:.5px solid var(--amber-bd)}
+.b-blue{background:var(--blue-bg);color:var(--blue);border:.5px solid var(--blue-bd)}
+.b-teal{background:var(--teal-bg);color:var(--teal);border:.5px solid var(--teal-bd)}
+.b-now{background:var(--amber-bg);color:var(--amber)}.b-build{background:var(--blue-bg);color:var(--blue)}
+.b-launch{background:var(--teal-bg);color:var(--teal)}.b-opp{background:var(--blush-bg);color:var(--blush)}
+input,textarea,select{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:.5px solid var(--parch3);border-radius:var(--rs);background:var(--parch);color:var(--ink);outline:none;transition:border-color .15s,background .15s;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);background:#fff}
+textarea{resize:vertical;min-height:70px;line-height:1.55}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a8a890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:var(--rs);border:.5px solid var(--parch3);background:#fff;color:var(--ink);cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--parch2)}
+.btn-p{background:var(--ink);color:var(--gold2);border-color:var(--ink)}.btn-p:hover{background:var(--ink2)}
+.btn-g{background:var(--gold);color:#fff;border-color:var(--gold)}.btn-g:hover{background:var(--gold2)}
+.btn-sm{font-size:12px;padding:6px 12px}
+.btn-ic{padding:6px;background:transparent;border:none;cursor:pointer;color:var(--ink4);transition:color .15s;flex-shrink:0;font-size:12px}
+.btn-ic:hover{color:var(--danger)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sec-lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prog{background:var(--parch2);border-radius:4px;overflow:hidden;height:4px}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.pf-gold{background:var(--gold)}.pf-teal{background:var(--teal)}.pf-blue{background:var(--blue)}
+.tab-row{display:flex;gap:2px;border-bottom:.5px solid var(--parch3);margin-bottom:1.5rem}
+.tab-btn{font-size:12.5px;padding:9px 16px;background:transparent;border:none;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab-btn:hover{color:var(--ink)}.tab-btn.on{color:var(--ink);border-bottom-color:var(--gold);font-weight:500}
+.tabv{display:none}.tabv.on{display:block}
+.pill{font-size:11px;padding:5px 13px;border-radius:99px;border:.5px solid var(--parch3);background:#fff;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
+.pill:hover{color:var(--ink)}.pill.on{background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+.chip{font-size:12px;padding:5px 13px;border-radius:99px;border:.5px solid var(--parch3);background:#fff;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
+.chip.on{background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+/* DASHBOARD */
+.focus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:1.75rem}
+.fc{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.fc:hover{border-color:var(--gold-bd);box-shadow:0 2px 12px rgba(184,146,58,.1)}
+.fc-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.fc-next{font-size:11px;color:var(--ink4);margin-top:8px;line-height:1.4}
+.fu-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--parch2)}
+.fu-row:last-child{border-bottom:none}
+.fu-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.fu-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;margin-left:auto;flex-shrink:0}
+.t-od{background:var(--danger-bg);color:var(--danger)}.t-sn{background:var(--amber-bg);color:var(--amber)}.t-ok{background:var(--teal-bg);color:var(--teal)}
+/* REVENUE */
+.rev-hero{background:var(--ink);border-radius:var(--rx);padding:2rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.rev-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(184,146,58,.07);pointer-events:none}
+.rev-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:6px}
+.rev-amt{font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:500;color:var(--gold2);line-height:1;position:relative}
+.rev-goal-txt{font-size:13px;color:rgba(255,255,255,.38);margin-top:6px;position:relative}
+.rev-pg-wrap{background:rgba(255,255,255,.1);border-radius:4px;height:6px;margin-top:14px;overflow:hidden;position:relative}
+.rev-pg-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold3));border-radius:4px;transition:width .6s ease}
+.rev-pg-mark{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,.35)}
+.rev-cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.rev-cat{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:16px}
+.rev-cat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:8px;font-weight:500}
+.rev-cat-amt{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--ink);line-height:1}
+.rev-cat-sub{font-size:11px;color:var(--ink4);margin-top:3px}
+.proj-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--parch2);flex-wrap:wrap}
+.proj-row:last-child{border-bottom:none}
+.proj-nm{font-size:13px;color:var(--ink);flex:1;min-width:120px}
+.proj-amt{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
+.p-rel{background:var(--blue-bg);color:var(--blue)}.p-pur{background:var(--gold-bg);color:var(--gold)}.p-del{background:var(--teal-bg);color:var(--teal)}
+/* CRM */
+.crm-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+.srch{flex:1;min-width:200px;position:relative}
+.srch input{padding-left:34px}
+.srch::before{content:'';position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23a8a890' stroke-width='2'%3E%3Ccircle cx='6' cy='6' r='5'/%3E%3Cpath d='m13 13-3.5-3.5'/%3E%3C/svg%3E") no-repeat;pointer-events:none}
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.cc{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.cc:hover{border-color:var(--gold-bd);box-shadow:0 2px 10px rgba(184,146,58,.08)}
+.cc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.cc-av{width:40px;height:40px;border-radius:50%;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--gold);flex-shrink:0;border:.5px solid var(--gold-bd)}
+.cc-nm{font-size:14px;font-weight:500;color:var(--ink);line-height:1.25}
+.cc-co{font-size:11px;color:var(--ink3);margin-top:2px}
+.cc-type{font-size:10px;color:var(--ink4);margin-top:1px}
+.cc-foot{display:flex;align-items:center;justify-content:space-between;border-top:.5px solid var(--parch2);padding-top:9px;margin-top:4px}
+.cc-last{font-size:11px;color:var(--ink4)}
+.panel-overlay{position:fixed;inset:0;background:rgba(24,24,15,.5);z-index:500;display:flex;justify-content:flex-end}
+.panel{background:#fff;width:460px;height:100vh;overflow-y:auto;padding:2rem;position:relative}
+.panel-close{position:absolute;top:1.25rem;right:1.25rem;background:transparent;border:none;cursor:pointer;color:var(--ink3);font-size:18px;line-height:1}
+.panel-close:hover{color:var(--ink)}
+/* ACTIVITIES */
+.act-quick{background:var(--ink);border-radius:var(--r);padding:1.5rem;margin-bottom:1.25rem}
+.act-quick-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold2);margin-bottom:1rem}
+.act-quick label{color:rgba(255,255,255,.38)}
+.act-quick input,.act-quick select{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1);color:#fff}
+.act-quick input::placeholder{color:rgba(255,255,255,.28)}
+.act-quick input:focus,.act-quick select:focus{background:rgba(255,255,255,.12);border-color:var(--gold)}
+.act-quick select option{background:var(--ink2);color:#fff}
+.act-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:.5px solid var(--parch2)}
+.act-row:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.act-what{font-size:13px;color:var(--ink);line-height:1.4}
+.act-meta{font-size:11px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+/* REPORT */
+.report-hero{background:var(--ink);border-radius:var(--rx);padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.report-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(184,146,58,.07);pointer-events:none}
+.rh-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--gold2);margin-bottom:4px}
+.rh-sub{font-size:13px;color:rgba(255,255,255,.35)}
+.rh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:1.25rem}
+.rh-stat{background:rgba(255,255,255,.07);border-radius:var(--rs);padding:12px 14px}
+.rh-stat-n{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold2);line-height:1}
+.rh-stat-l{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;text-transform:uppercase;letter-spacing:.08em}
+.month-section{margin-bottom:2rem}
+.month-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--parch2);border-radius:var(--rs);margin-bottom:10px;cursor:pointer;user-select:none}
+.month-hd-left{display:flex;align-items:center;gap:12px}
+.month-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--ink)}
+.month-count{font-size:11px;color:var(--ink3)}
+.month-body{border:.5px solid var(--parch3);border-radius:var(--r);overflow:hidden;background:#fff}
+.month-body.collapsed{display:none}
+.cat-group{border-bottom:.5px solid var(--parch2)}
+.cat-group:last-child{border-bottom:none}
+.cat-group-hd{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--parch);border-bottom:.5px solid var(--parch2)}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cat-group-name{font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.cat-group-cnt{font-size:10px;color:var(--ink4);margin-left:auto}
+.act-item{display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:.5px solid var(--parch2)}
+.act-item:last-child{border-bottom:none}
+.act-item-txt{font-size:13px;color:var(--ink);flex:1;line-height:1.4}
+.act-item-note{font-size:11px;color:var(--ink3);margin-top:2px;font-style:italic}
+.print-bar{display:flex;gap:8px;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap}
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--parch3);border:.5px solid var(--parch3);border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem}
+.cal-dh{background:var(--parch);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:8px;text-align:center;font-weight:500}
+.cal-day{background:#fff;min-height:76px;padding:5px;cursor:pointer;transition:background .1s}
+.cal-day:hover{background:var(--gold-bg)}.cal-day.today{background:var(--gold-bg)}.cal-day.om .cal-dn{color:var(--ink5)}
+.cal-dn{font-size:12px;color:var(--ink);margin-bottom:3px;font-weight:500;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.cal-day.today .cal-dn{background:var(--gold);color:#fff}
+.cal-ev{font-size:9px;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ev-fti{background:var(--blue-bg);color:var(--blue)}.ev-side{background:var(--teal-bg);color:var(--teal)}
+.ev-wo{background:var(--amber-bg);color:var(--amber)}.ev-dog{background:#f5f0e4;color:#7a6030}
+.ev-life{background:var(--parch2);color:var(--ink3)}.ev-sun{background:var(--blush-bg);color:var(--blush)}
+.wk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:1.25rem}
+.wk-col{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);overflow:hidden}
+.wk-col.today-col{border-color:var(--gold)}
+.wk-hd{padding:8px 10px;background:var(--parch);border-bottom:.5px solid var(--parch3);text-align:center}
+.wk-dy{font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.wk-dt{font-size:16px;font-weight:500;color:var(--ink);font-family:'Cormorant Garamond',serif}
+.wk-col.today-col .wk-dt{color:var(--gold)}
+.wk-blks{padding:6px}
+.wk-blk{padding:5px 7px;border-radius:6px;margin-bottom:4px;cursor:pointer;position:relative}
+.wk-blk:hover .blk-x{opacity:1}
+.blk-tm{font-size:9px;opacity:.7;margin-bottom:1px}
+.blk-lb{font-size:11px;font-weight:500;line-height:1.3}
+.blk-x{position:absolute;top:3px;right:4px;background:none;border:none;font-size:10px;cursor:pointer;opacity:0;transition:opacity .1s;color:inherit}
+.cal-add{background:var(--parch);border:.5px solid var(--parch3);border-radius:var(--r);padding:16px}
+/* TASKS */
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:.5px solid var(--parch2)}
+.task-row:last-child{border-bottom:none}
+.task-row input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--gold);flex-shrink:0;width:14px;height:14px}
+.task-txt{font-size:13px;color:var(--ink);flex:1;line-height:1.45}
+.task-txt.done{text-decoration:line-through;color:var(--ink5)}
+/* NOTES */
+.win-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:.5px solid var(--parch2)}
+.win-row:last-child{border-bottom:none}
+.win-star{color:var(--gold);font-size:14px;flex-shrink:0;margin-top:1px}
+.note-card{background:#fff;border:.5px solid var(--parch3);border-radius:var(--r);padding:16px 18px;margin-bottom:8px}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:var(--gold2);font-size:13px;padding:10px 20px;border-radius:99px;z-index:999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-ov{position:fixed;inset:0;background:rgba(24,24,15,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-ov.open{display:flex}
+.modal-box{background:#fff;border-radius:var(--rx);padding:2rem;width:100%;max-width:450px}
+@media print{.sb,.btn,.btn-row,.act-quick,.cal-add,.crm-bar,.print-bar,.sb-foot{display:none!important}.main{margin-left:0;padding:1rem}.view.on{display:block}}
+@media(max-width:768px){.sb{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap}.main{margin-left:0;padding:1rem}.sb-nav{display:flex;flex-direction:row;overflow-x:auto;width:100%;border-top:.5px solid rgba(255,255,255,.07)}.sb-sec{display:none}.sb-item{padding:10px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap}.sb-item.on{border-bottom-color:var(--gold);border-left:none}.sb-brand{flex:1;padding:1rem 1.25rem}.sb-foot{display:none}.stats,.rev-cat-grid,.rh-stats{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.cc-grid{grid-template-columns:1fr}.panel{width:100%;height:80vh;position:fixed;bottom:0;border-radius:var(--rx) var(--rx) 0 0}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sb">
+  <div class="sb-brand"><div class="sb-title">Shelly's OS</div><div class="sb-sub">Command Center · 2026</div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <div class="sb-item on" onclick="goView('dashboard',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="sb-sec">FTI Revenue</div>
+    <div class="sb-item" onclick="goView('revenue',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Revenue tracker</div>
+    <div class="sb-item" onclick="goView('crm',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts &amp; CRM</div>
+    <div class="sb-item" onclick="goView('activities',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Activity log</div>
+    <div class="sb-item" onclick="goView('report',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Leadership report</div>
+    <div class="sb-sec">Planning</div>
+    <div class="sb-item" onclick="goView('calendar',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</div>
+    <div class="sb-item" onclick="goView('tracker',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Venture tracker</div>
+    <div class="sb-sec">Personal</div>
+    <div class="sb-item" onclick="goView('personal',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>My life</div>
+    <div class="sb-sec">Capture</div>
+    <div class="sb-item" onclick="goView('notes',this)"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Notes &amp; wins</div>
+  </nav>
+  <div class="sb-foot"><span class="sb-pip"></span>Saved locally<br><span id="saved-lbl" style="opacity:.5">—</span></div>
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view on">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title" id="d-greet">Good morning, Shelly.</div><div class="pg-sub" id="d-date"></div></div><span style="font-size:12px;background:#fff;border:.5px solid var(--parch3);border-radius:99px;padding:5px 14px;color:var(--ink3)" id="d-week"></span></div></div>
+  <div class="stats" id="d-stats"></div>
+  <div class="g2" style="margin-bottom:1.75rem;align-items:start">
+    <div><div class="sec-lbl">Venture progress</div><div class="focus-grid" id="d-focus"></div></div>
+    <div><div class="sec-lbl">Follow-ups due soon</div><div class="card" style="padding:14px 18px"><div id="d-fu"></div></div></div>
+  </div>
+  <div class="sec-lbl">Recent wins</div>
+  <div class="card" style="padding:14px 18px"><div id="d-wins"></div><button class="btn btn-sm" style="margin-top:10px" onclick="goView('notes',document.querySelector('[onclick*=notes]'))">Log a win →</button></div>
+</div>
+
+<!-- REVENUE -->
+<div id="view-revenue" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title">Revenue tracker</div><div class="pg-sub">FTI D&A · Dallas · 2026 · Floor $4M · Goal $8–10M</div></div><div style="display:flex;gap:8px;align-items:center"><select id="rev-qf" onchange="renderRevenue()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="all">All quarters</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select><button class="btn btn-p btn-sm" onclick="openRevModal()">+ Add project</button></div></div></div>
+  <div class="rev-hero" id="rev-hero"></div>
+  <div class="rev-cat-grid" id="rev-cats"></div>
+  <div class="card"><div class="card-hd"><div><div class="card-title">Project entries</div><div class="card-sub">Project-level detail rolling up to category totals</div></div></div><div id="rev-projs"></div></div>
+</div>
+<div id="rev-modal" class="modal-ov">
+  <div class="modal-box">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:1.25rem">Add project</div>
+    <div style="display:grid;gap:12px">
+      <div><label>Project / matter name</label><input id="rp-nm" type="text" placeholder="e.g. Celanese investigation"></div>
+      <div class="g2"><div><label>Category</label><select id="rp-cat"><option>Relationship</option><option>Pursuit</option><option>Delivery</option></select></div><div><label>Quarter</label><select id="rp-q"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select></div></div>
+      <div><label>Amount ($)</label><input id="rp-amt" type="number" placeholder="250000"></div>
+      <div><label>Notes</label><textarea id="rp-notes" placeholder="Client, context, next steps…" style="min-height:60px"></textarea></div>
+    </div>
+    <div class="btn-row" style="margin-top:1.25rem"><button class="btn btn-p" onclick="saveRevProj()">Save</button><button class="btn" onclick="closeRevModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CRM -->
+<div id="view-crm" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title">Contacts &amp; CRM</div><div class="pg-sub">Gold · Silver · Bronze · your full relationship map</div></div><button class="btn btn-p" onclick="openCx(null)">+ Add contact</button></div></div>
+  <div class="crm-bar">
+    <div class="srch"><input id="crm-q" type="text" placeholder="Search name, company, firm…" oninput="renderCRM()"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <div class="pill on" onclick="setCF('all',this)">All</div>
+      <div class="pill" onclick="setCF('Gold',this)">⭑ Gold</div>
+      <div class="pill" onclick="setCF('Silver',this)">Silver</div>
+      <div class="pill" onclick="setCF('Bronze',this)">Bronze</div>
+      <div class="pill" onclick="setCF('Law Firm',this)">Law firm</div>
+      <div class="pill" onclick="setCF('Corporate',this)">Corporate</div>
+      <div class="pill" onclick="setCF('fu',this)">Follow-up due</div>
+    </div>
+  </div>
+  <div id="crm-cnt" style="font-size:12px;color:var(--ink3);margin-bottom:12px"></div>
+  <div class="cc-grid" id="cc-grid"></div>
+</div>
+<div id="cp-overlay" class="panel-overlay" style="display:none"><div class="panel"><button class="panel-close" onclick="closeCx()">✕</button><div id="cp-body"></div></div></div>
+
+<!-- ACTIVITIES -->
+<div id="view-activities" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title">Activity log</div><div class="pg-sub">79 activities pre-loaded from your tracker · Jan–Mar 2026</div></div><button class="btn btn-sm" onclick="goView('report',document.querySelector('[onclick*=report]'))">View leadership report →</button></div></div>
+  <div class="act-quick">
+    <div class="act-quick-title">Log a new activity</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end">
+      <div><label>What happened</label><input id="a-what" type="text" placeholder="Lunch with Bill Mateja…"></div>
+      <div><label>Category</label><select id="a-cat"><option>BD/Marketing Support</option><option>Corporate Outreach</option><option>Law Firm Outreach</option><option>Conference</option><option>Internal Outreach</option><option>Internal - Strategy</option><option>Law Firm Event</option></select></div>
+      <div><label>Month</label><select id="a-month"><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select></div>
+      <div style="padding-top:18px"><button class="btn btn-g" onclick="logAct()" style="width:100%">Log it</button></div>
+    </div>
+    <div style="margin-top:10px"><label>Notes (optional)</label><input id="a-notes" type="text" placeholder="Follow-up, key takeaway, people involved…"></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:1rem;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;font-size:12px;color:var(--ink3)" id="a-cnt"></div>
+    <select id="a-mo-filt" onchange="renderActs()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="all">All months</option><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select>
+    <select id="a-filt" onchange="renderActs()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="all">All categories</option><option>BD/Marketing Support</option><option>Corporate Outreach</option><option>Law Firm Outreach</option><option>Conference</option><option>Internal Outreach</option><option>Internal - Strategy</option><option>Law Firm Event</option></select>
+  </div>
+  <div class="card" style="padding:14px 18px"><div id="a-list"></div></div>
+</div>
+
+<!-- LEADERSHIP REPORT -->
+<div id="view-report" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title">Leadership report</div><div class="pg-sub">D&A Go-To-Market Activities · Shelly Mady · 2026</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="rpt-yr" onchange="renderReport()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="2026">2026</option></select><select id="rpt-mo" onchange="renderReport()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="all">All months</option><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select><button class="btn btn-p btn-sm" onclick="window.print()">Print / PDF</button></div></div></div>
+  <div id="report-body"></div>
+</div>
+
+<!-- CALENDAR -->
+<div id="view-calendar" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title" id="cal-ttl">Calendar</div><div class="pg-sub">Real dates · click day to pre-fill</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn btn-sm" onclick="calNav(-1)">← Prev</button><button class="btn btn-sm" onclick="calToday()">Today</button><button class="btn btn-sm" onclick="calNav(1)">Next →</button><select id="cal-view" onchange="renderCal()" style="width:auto;font-size:12px;padding:6px 28px 6px 10px"><option value="month">Month</option><option value="week">Week</option></select></div></div></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1.25rem;font-size:12px;color:var(--ink3)">
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block"></span>FTI networking</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--teal);display:inline-block"></span>Side hustle</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--amber);display:inline-block"></span>Workout</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#a8864a;display:inline-block"></span>Dog walk</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blush);display:inline-block"></span>Deep work</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--ink4);display:inline-block"></span>Protected</span>
+  </div>
+  <div id="cal-body"></div>
+  <div class="cal-add" style="margin-top:1rem">
+    <div class="sec-lbl" style="margin-bottom:10px">Add a block</div>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr auto auto;gap:8px;align-items:end">
+      <div><label>Date</label><input id="blk-dt" type="date" style="width:140px"></div>
+      <div><label>Time</label><input id="blk-tm" type="text" placeholder="e.g. 7–8am"></div>
+      <div><label>Label</label><input id="blk-lb" type="text" placeholder="Block label"></div>
+      <div><label>Type</label><select id="blk-ct" style="width:auto"><option value="fti">FTI networking</option><option value="side">Side hustle</option><option value="wo">Workout</option><option value="dog">Dog walk</option><option value="life">Protected</option><option value="sun">Deep work</option></select></div>
+      <div style="padding-top:18px"><button class="btn btn-p" onclick="addBlk()">Add</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PERSONAL / MY LIFE -->
+<div id="view-personal" class="view">
+  <div class="pg-hd"><div class="pg-row"><div><div class="pg-title">My life</div><div class="pg-sub">Health & wellness · personal growth · life admin</div></div></div></div>
+  <div class="tab-row">
+    <button class="tab-btn on" onclick="swPTab('health',this)">Health & wellness</button>
+    <button class="tab-btn" onclick="swPTab('growth',this)">Growth & leisure</button>
+    <button class="tab-btn" onclick="swPTab('admin',this)">Life admin</button>
+  </div>
+  <div id="ptabv-health" class="tabv on">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-hd" style="margin-bottom:10px"><div><div class="card-title">Appointments to schedule</div><div class="card-sub">Add it here so it doesn't live in your head</div></div></div>
+        <div id="h-appts"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><input type="text" id="h-appt-in" placeholder="e.g. Annual bloodwork, fertility consult, derm…" style="flex:1" onkeydown="if(event.key==='Enter')addHAppt()"><button class="btn btn-sm btn-p" onclick="addHAppt()">Add</button></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-hd" style="margin-bottom:10px"><div><div class="card-title">Scheduled appointments</div><div class="card-sub">Confirmed dates coming up</div></div></div>
+        <div id="h-sched"></div>
+        <div style="display:grid;grid-template-columns:1fr 140px auto;gap:8px;margin-top:12px;align-items:center"><input type="text" id="h-sch-what" placeholder="Appointment name"><input type="date" id="h-sch-date"><button class="btn btn-sm btn-p" onclick="addHSched()">Add</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd" style="margin-bottom:10px"><div><div class="card-title">Health notes</div><div class="card-sub">Bloodwork, peptides, energy, things to ask the doctor</div></div></div>
+      <div id="h-notes"></div>
+      <div style="margin-top:12px"><input type="text" id="h-note-in" placeholder="Log a note — energy levels, labs, peptide protocol, questions to ask…" onkeydown="if(event.key==='Enter')addHNote()"></div>
+    </div>
+  </div>
+  <div id="ptabv-growth" class="tabv">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.25rem">
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:20px">📚</span><div><div style="font-size:14px;font-weight:500;color:var(--ink)">Reading list</div><div style="font-size:11px;color:var(--ink3)">Books & learning</div></div></div>
+        <div id="gl-books"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><input type="text" id="gl-bk-in" placeholder="Add a book…" style="flex:1" onkeydown="if(event.key==='Enter')addGL('books','gl-bk-in')"><button class="btn btn-sm" onclick="addGL('books','gl-bk-in')">+</button></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:20px">📈</span><div><div style="font-size:14px;font-weight:500;color:var(--ink)">Investing & markets</div><div style="font-size:11px;color:var(--ink3)">Things to learn & explore</div></div></div>
+        <div id="gl-invest"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><input type="text" id="gl-inv-in" placeholder="Topic, resource, action…" style="flex:1" onkeydown="if(event.key==='Enter')addGL('invest','gl-inv-in')"><button class="btn btn-sm" onclick="addGL('invest','gl-inv-in')">+</button></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:20px">🎬</span><div><div style="font-size:14px;font-weight:500;color:var(--ink)">Watch list</div><div style="font-size:11px;color:var(--ink3)">Shows, movies, downtime</div></div></div>
+        <div id="gl-shows"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><input type="text" id="gl-sh-in" placeholder="Add a show or movie…" style="flex:1" onkeydown="if(event.key==='Enter')addGL('shows','gl-sh-in')"><button class="btn btn-sm" onclick="addGL('shows','gl-sh-in')">+</button></div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--gold-bg);border-color:var(--gold-bd)"><div style="font-size:13px;color:var(--ink2);line-height:1.7"><span style="font-weight:500;color:var(--gold)">A reminder:</span> These aren't tasks with deadlines. Check things off when you get to them — no pressure, no schedule. Downtime is productive. Rest is strategy.</div></div>
+  </div>
+  <div id="ptabv-admin" class="tabv">
+    <div class="card" style="background:var(--ink);border-color:var(--ink);margin-bottom:1rem;padding:1.25rem 1.5rem">
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="text" id="la-in" placeholder="Add a task — dry cleaning, call doctor, schedule haircut, book travel…" style="flex:1;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:#fff" onkeydown="if(event.key==='Enter')addAdmin()">
+        <button class="btn btn-g" onclick="addAdmin()" style="flex-shrink:0">Add</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:1rem;align-items:center"><div style="flex:1;font-size:12px;color:var(--ink3)" id="la-cnt"></div><button class="btn btn-sm" onclick="clearAdmin()" style="font-size:11px;color:var(--ink4)">Clear completed</button></div>
+    <div class="card" style="padding:14px 18px"><div id="la-list"></div></div>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="view-tracker" class="view">
+  <div class="pg-hd"><div class="pg-title">Venture tracker</div><div class="pg-sub">Actions and progress across all ventures</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem" id="v-chips"></div>
+  <div id="v-detail"></div>
+</div>
+
+<!-- NOTES & WINS -->
+<div id="view-notes" class="view">
+  <div class="pg-hd"><div class="pg-title">Notes &amp; wins</div><div class="pg-sub">Capture momentum as it happens</div></div>
+  <div class="tab-row"><button class="tab-btn on" onclick="swTab('wins',this)">Wins</button><button class="tab-btn" onclick="swTab('strategy',this)">Strategy notes</button></div>
+  <div id="tabv-wins" class="tabv on">
+    <div class="card" style="margin-bottom:1rem;padding:16px 18px"><div style="display:flex;gap:10px"><input id="win-in" type="text" placeholder="What moved forward today?" style="flex:1" onkeydown="if(event.key==='Enter')addWin()"><button class="btn btn-g" onclick="addWin()">Log win</button></div></div>
+    <div class="card" style="padding:14px 18px"><div id="wins-list"></div></div>
+  </div>
+  <div id="tabv-strategy" class="tabv">
+    <div class="card" style="margin-bottom:1rem;padding:16px 18px"><div style="display:grid;gap:12px"><div class="g2"><div><label>Venture</label><select id="note-v"><option value="fti">FTI / D&A</option><option value="cog">Cognosis TX</option><option value="con">Concierge medicine</option><option value="may">Maydé Jewels</option><option value="car">Dad's carwash</option><option value="gen">General</option></select></div></div><div><label>Note</label><textarea id="note-in" placeholder="Thought, next step, or strategic idea…"></textarea></div><div><button class="btn btn-p" onclick="addNote()">Save note</button></div></div></div>
+    <div id="notes-list"></div>
+  </div>
+</div>
+
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// SEED DATA — all 79 activities Jan–Mar 2026
+// ══════════════════════════════════════════════
+const SEED_ACTS = [
+  // JANUARY 2026
+  {id:1001,what:"Lunch with Ollie Chandhok (Dallas Business Journal)",cat:"BD/Marketing Support",month:"Jan",year:2026,notes:""},
+  {id:1002,what:"Prepare compliance monitoring program benchmark for Greg Bates (In-house GC - Aduana)",cat:"Corporate Outreach",month:"Jan",year:2026,notes:""},
+  {id:1003,what:"Hawaii Trip: PTC Data Center Conference",cat:"Conference",month:"Jan",year:2026,notes:""},
+  {id:1004,what:"Hawaii Trip: Meeting with Andrew Schaap (CEO - Aligned Data Centers)",cat:"Conference",month:"Jan",year:2026,notes:"Move into Data Center space — strong connections made at PTC"},
+  {id:1005,what:"Hawaii Trip: Meeting with Fran Federman (CIO - Cyrus One)",cat:"Conference",month:"Jan",year:2026,notes:""},
+  {id:1006,what:"Hawaii Trip: Meeting with Craig McKesson (CCO - Takanok)",cat:"Conference",month:"Jan",year:2026,notes:""},
+  {id:1007,what:"Hawaii Trip: Meeting with Andy Hopkins (PJT Partners)",cat:"Conference",month:"Jan",year:2026,notes:""},
+  {id:1008,what:"Meeting with Craig McKesson (Takanok) x2",cat:"Corporate Outreach",month:"Jan",year:2026,notes:"Has turned into opportunities for FTI"},
+  {id:1009,what:"Meeting with Tan Phan (Total Energies)",cat:"Corporate Outreach",month:"Jan",year:2026,notes:"Lost proposal due to rates concern"},
+  {id:1010,what:"Meeting with LinkedIn to discuss BD resourcing",cat:"BD/Marketing Support",month:"Jan",year:2026,notes:""},
+  {id:1011,what:"Energy Steering Committee Meetings",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1012,what:"Central Region D&A Meeting",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1013,what:"Dallas Growth Initiative Cross Segment Leadership Strategy Meeting",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1014,what:"Meeting with Andrew Schaap (CEO - Aligned Data Centers)",cat:"Corporate Outreach",month:"Jan",year:2026,notes:""},
+  {id:1015,what:"D&A Energy Strategy Meeting with Allison Griffin",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1016,what:"Meeting with Greg Parker — Data Center planning for upcoming conference",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1017,what:"Intro to Kaly Trupp (TMT) re data center initiative",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1018,what:"BD Accountability and Strategy meeting with Suzy Takata",cat:"Internal - Strategy",month:"Jan",year:2026,notes:""},
+  {id:1019,what:"ACC Awards Event",cat:"BD/Marketing Support",month:"Jan",year:2026,notes:""},
+  {id:1020,what:"WACDFW: FTI hosted event — AI and New Information Order panel",cat:"BD/Marketing Support",month:"Jan",year:2026,notes:""},
+  {id:1021,what:"Event with Rebecca Fike (V&E)",cat:"Law Firm Outreach",month:"Jan",year:2026,notes:""},
+  {id:1022,what:"1-1 Meetings: Terry Brody, Chad Coben, Nate Hein, Cecily Gooch, Drew Sheehan, Katy Quintanilla, Allison Griffin, David Turner, Greg Parker, Marty Wilczynski",cat:"Internal Outreach",month:"Jan",year:2026,notes:""},
+  // FEBRUARY 2026
+  {id:1023,what:"Sidley Growth Team Call",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1024,what:"Intro call: Travis Windle & Patrick Creighton (Strat Comm) re Aligned Data Center opportunity",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1025,what:"Energy Steering Committee Meetings",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1026,what:"Central Region D&A Meeting",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1027,what:"Meeting with Andrew Schaap (CEO - Aligned Data Centers)",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1028,what:"Meeting with Craig McKesson (Takanok) x2",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1029,what:"Initiate D&A Specific Data Center Call and Working Group",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1030,what:"Event with Kayla Whaling (Blockchain.com)",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1031,what:"Meeting with Jason Colombo (GC - Point 72)",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1032,what:"Texas A&M Corporate Symposium Conference",cat:"Conference",month:"Feb",year:2026,notes:""},
+  {id:1033,what:"Dallas Assembly Lunch with Cecily Gooch",cat:"BD/Marketing Support",month:"Feb",year:2026,notes:""},
+  {id:1034,what:"World Affairs Council Event — Scott Bessent (Secretary of Treasury) in conversation with Ray Washburne",cat:"BD/Marketing Support",month:"Feb",year:2026,notes:""},
+  {id:1035,what:"World Affairs Council Board Retreat",cat:"BD/Marketing Support",month:"Feb",year:2026,notes:""},
+  {id:1036,what:"WWCDA Morning Mixer — Enforcement Trends with SEC's Jaime Marinaro",cat:"Law Firm Outreach",month:"Feb",year:2026,notes:""},
+  {id:1037,what:"Consumer Business Follow-up Strategy Meeting with CF Txn",cat:"Internal - Strategy",month:"Feb",year:2026,notes:""},
+  {id:1038,what:"Meeting: Ashley Swink Fincher (Comerica), Carrie Kirby (Vistra), Cecily Gooch at Park House",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1039,what:"Lunch with Andrew Schaap (CEO - Aligned Data Centers)",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1040,what:"Dinner with Andrew Schaap (Aligned DC) and Wes Cummins (CEO - Applied Digital)",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1041,what:"Meeting with Chad Francis and Emily McIntosh — recruitment and new hire intro",cat:"Internal Outreach",month:"Feb",year:2026,notes:""},
+  {id:1042,what:"Florida Trip: Meeting with Craig McKesson around MetroConnect",cat:"Corporate Outreach",month:"Feb",year:2026,notes:""},
+  {id:1043,what:"1-1 Meetings: Max Cantin, Dave Manek, Nate Hein, Ryan Sumberac, Marty Wilczynski, Cecily Gooch",cat:"Internal Outreach",month:"Feb",year:2026,notes:""},
+  // MARCH 2026
+  {id:1044,what:"Strategy Meeting with Erin Dunn on Dallas Market and expanding BD opportunities",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1045,what:"Intro meeting with Jess Bolander (Lockton) at Park House",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1046,what:"Happy Hour intro meeting with Chelsea Hilliard (Partner - Dorsey)",cat:"Law Firm Outreach",month:"Mar",year:2026,notes:""},
+  {id:1047,what:"Internal Happy hour with FLC contacts and recruits (Chad, Emily, Ryan)",cat:"Internal Outreach",month:"Mar",year:2026,notes:""},
+  {id:1048,what:"Dallas Bar Association — Data Center Lunch Event",cat:"BD/Marketing Support",month:"Mar",year:2026,notes:""},
+  {id:1049,what:"Intro coffee meeting with Chauncey Lane (Holland & Knight)",cat:"Law Firm Outreach",month:"Mar",year:2026,notes:""},
+  {id:1050,what:"Energy Steering Committee Meetings",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1051,what:"Central Region D&A Meeting",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1052,what:"San Diego Trip: WWCDA Annual Meeting & ABA White Collar Crime Conference",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1053,what:"San Diego Trip: Meeting with Suzy Takata",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1054,what:"San Diego Trip: Meeting with Toni Mele",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1055,what:"San Diego Trip: Meeting with D&A West Coast colleagues",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1056,what:"San Diego Trip: Benesch Event",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1057,what:"San Diego Trip: BakerHostetler Event",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1058,what:"San Diego Trip: Philadelphia Bar Event",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1059,what:"San Diego Trip: FTI Event",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1060,what:"San Diego Trip: Bracewell Event",cat:"Conference",month:"Mar",year:2026,notes:""},
+  {id:1061,what:"Intro: Craig McKesson (Takanok) to Greg Parker and Navid",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1062,what:"Intro: Craig McKesson (Takanok) to Erin McPike",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1063,what:"Intro meeting to Michelle Reed (Partner - Paul Hastings)",cat:"Law Firm Outreach",month:"Mar",year:2026,notes:""},
+  {id:1064,what:"Meeting with Syed Raza — FS strategy opportunities in DFW / Houston",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1065,what:"Breakfast meeting with Jeff Bockus and Troy Kubes — expertise and market opportunities",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1066,what:"Meeting with Joe Knight and Kyle Wetzold — AI services",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1067,what:"Follow-up outreach to Greg Bates (Aduana) — intro Vincent, compliance inquiry",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1068,what:"Meeting with Craig McKesson (Takanok) and Erin McPike — potential StratComm work",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1069,what:"Follow-up meeting with Chelsea Hilliard (Dorsey) — Data Center contacts & DBA sponsorship",cat:"Law Firm Outreach",month:"Mar",year:2026,notes:""},
+  {id:1070,what:"1-1 with Craig McKesson — feedback on pitch",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1071,what:"Lunch with Andrew Schaap (CEO - Aligned Data Centers) — new Chief Strategy Officer intro",cat:"Corporate Outreach",month:"Mar",year:2026,notes:""},
+  {id:1072,what:"Lunch with Chad, Nate, and Reed Smith (Rebecca + Associate)",cat:"Law Firm Outreach",month:"Mar",year:2026,notes:""},
+  {id:1073,what:"Second D&A Specific Data Center Call and Working Group",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1074,what:"AI FLC Subcommittee Quarterly",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1075,what:"United Way Bench and Bar Event",cat:"BD/Marketing Support",month:"Mar",year:2026,notes:""},
+  {id:1076,what:"Dallas GTM Leadership Meeting",cat:"Internal - Strategy",month:"Mar",year:2026,notes:""},
+  {id:1077,what:"WACDFW Educator of the Year Luncheon",cat:"BD/Marketing Support",month:"Mar",year:2026,notes:""},
+  {id:1078,what:"K&L Gates Quarterly Happy Hour",cat:"BD/Marketing Support",month:"Mar",year:2026,notes:""},
+  {id:1079,what:"1-1 Meetings: Erin Dunn, Erin McPike, Cecily Gooch, Syed Raza, Matt McClelland, Vincent Flores, Nate Hein, Chad Francis, Greg Parker, Ryan Sumberac",cat:"Internal Outreach",month:"Mar",year:2026,notes:""},
+];
+
+const SEED_CX=[
+  {id:1,name:'Rebecca Fike',company:'V&E',type:'Law Firm',tier:'Gold',lastOutreach:'2026-03-15',nextFollowup:'2026-06-10',outreachType:'Meeting',notes:"Key relationship. See regularly through women's network.",need:'Investigations, Litigation'},
+  {id:2,name:'Bill Mateja',company:'Sheppard Mullin',type:'Law Firm',tier:'Gold',lastOutreach:'2026-05-15',nextFollowup:'2026-06-15',outreachType:'Meeting',notes:'Strong D&A referral potential.',need:'D&A'},
+  {id:3,name:'Brice White',company:'Brinks',type:'Corporate',tier:'Silver',lastOutreach:'2026-05-01',nextFollowup:'2026-06-20',outreachType:'Lunch',notes:'CLO. Moving from Infosys. Strong Dallas connector.',need:'Investigations'},
+  {id:4,name:'Paige Montgomery',company:'Sidley',type:'Law Firm',tier:'Silver',lastOutreach:'2026-04-10',nextFollowup:'2026-07-01',outreachType:'Meeting',notes:'Health issues — follow up gently.',need:'Litigation'},
+  {id:5,name:'Shawn Cleveland',company:'Baker Hostetler',type:'Law Firm',tier:'Silver',lastOutreach:'2026-05-20',nextFollowup:'2026-06-30',outreachType:'Lunch',notes:'Trusted D&A resources retired — opportunity to fill gap.',need:'D&A'},
+  {id:6,name:'Greg Bates',company:'Aduana',type:'Corporate',tier:'Gold',lastOutreach:'2026-03-01',nextFollowup:'2026-06-15',outreachType:'Email',notes:'GC — compliance monitoring program. Pursuing Q2/Q3 2026.',need:'Compliance'},
+  {id:7,name:'Chelsea Hilliard',company:'Dorsey',type:'Law Firm',tier:'Silver',lastOutreach:'2026-03-15',nextFollowup:'2026-06-25',outreachType:'Meeting',notes:'Data center contacts + DBA sponsorship discussed.',need:'D&A, Data Centers'},
+  {id:8,name:'Chauncey Lane',company:'Holland & Knight',type:'Law Firm',tier:'Bronze',lastOutreach:'2026-03-01',nextFollowup:'2026-06-20',outreachType:'Coffee',notes:'Introduced through Joanna Ridgway.',need:'TBD'},
+  {id:9,name:'Paul Genender',company:'Paul Hastings',type:'Law Firm',tier:'Silver',lastOutreach:'2026-04-10',nextFollowup:'2026-07-01',outreachType:'Meeting',notes:'Planning joint FTI/Paul Hastings lunch.',need:'Litigation'},
+  {id:10,name:'Fran Federman',company:'CyrusOne',type:'Corporate',tier:'Silver',lastOutreach:'2026-01-20',nextFollowup:'2026-07-01',outreachType:'Meeting',notes:'CIO. Data center angle. Met at PTC Hawaii.',need:'Data Centers'},
+  {id:11,name:'Craig McKesson',company:'Takanok',type:'Corporate',tier:'Gold',lastOutreach:'2026-03-15',nextFollowup:'2026-06-15',outreachType:'Meeting',notes:'CCO. Multiple meetings. Turned into FTI opportunities. Strat Comm pitch in progress.',need:'StratComm, D&A'},
+  {id:12,name:'Andrew Schaap',company:'Aligned Data Centers',type:'Corporate',tier:'Gold',lastOutreach:'2026-03-15',nextFollowup:'2026-06-15',outreachType:'Lunch',notes:'CEO. Multiple meetings since Hawaii. Key data center relationship.',need:'Data Centers, D&A'},
+  {id:13,name:'Jason Colombo',company:'Point 72',type:'Corporate',tier:'Gold',lastOutreach:'2026-02-10',nextFollowup:'2026-07-01',outreachType:'Meeting',notes:'GC. Will meet in NYC. Every-other-month touchpoints.',need:'TBD'},
+  {id:14,name:'Jess Bolander',company:'Lockton',type:'Corporate',tier:'Bronze',lastOutreach:'2026-03-01',nextFollowup:'2026-07-15',outreachType:'Meeting',notes:'Introduced through Joanna Ridgway.',need:'TBD'},
+  {id:15,name:'Talmage Boston',company:'Shackelford Bowen',type:'Law Firm',tier:'Silver',lastOutreach:'2026-01-15',nextFollowup:'2026-07-01',outreachType:'Email',notes:'Introduced to World Affairs Council. Very connected in Dallas.',need:'General'},
+];
+
+const VENTURES=[
+  {id:'fti',name:'FTI / D&A',badge:'b-now',bl:'Revenue now',tasks:['Join ACFE Dallas chapter','Map top 20 outside counsel targets','Build D&A capability one-pager','Attend one data center industry event','Set up Google alerts: Dallas litigation & hyperscaler','Schedule 3 networking lunches this week']},
+  {id:'cog',name:'Cognosis TX',badge:'b-build',bl:'Building',tasks:['Research Texas mental health licensing reqs','Map DFW employer target list','Identify Cognosis competitors in TX','Connect with one Dallas psychiatrist','Sync with John on TX expansion plan']},
+  {id:'con',name:'Concierge medicine',badge:'b-build',bl:'Building',tasks:['Research TX Medical Board concierge rules','Define membership tier pricing model','Identify physician of record candidate','Review current FDA peptide guidance 2025']},
+  {id:'may',name:'Maydé Jewels',badge:'b-launch',bl:'Launching',tasks:['Finalize logo & symbol element','Build bespoke consultation process doc','Plan first Dallas pop-up event','Identify 3 style influencer partners','Set up Instagram & Pinterest']},
+  {id:'car',name:"Dad's carwash",badge:'b-opp',bl:'Opportunity',tasks:["Elevate Washery website","Normalize 3-yr EBITDA financials","Document site lease terms","Research carwash M&A advisors","Start unlimited wash membership pass"]}
+];
+
+const VNAMES={fti:'FTI / D&A',cog:'Cognosis TX',con:'Concierge',may:'Maydé Jewels',car:"Dad's carwash",gen:'General'};
+const CAT_COLORS={fti:'#2a72b8',side:'#1a8a65',wo:'#a86820',dog:'#8a6c32',life:'#888780',sun:'#c44f78'};
+const CAT_CSS={fti:'ev-fti',side:'ev-side',wo:'ev-wo',dog:'ev-dog',life:'ev-life',sun:'ev-sun'};
+const ACT_CLR={'BD/Marketing Support':'#c44f78','Corporate Outreach':'#1a8a65','Law Firm Outreach':'#2a72b8','Conference':'#a86820','Internal Outreach':'#888780','Internal - Strategy':'#7a5ab8','Law Firm Event':'#b83028'};
+const MONTH_ORDER=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function lset(k,v){try{localStorage.setItem(k,JSON.stringify(v));setSaved()}catch{}}
+function setSaved(){const el=document.getElementById('saved-lbl');if(el)el.textContent='Saved '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+
+let S={
+  tasks:ls('s6_tasks',{}),
+  contacts:ls('s6_cx',SEED_CX),
+  revenue:ls('s6_rev',[]),
+  activities:ls('s6_acts', SEED_ACTS),
+  cal:ls('s6_cal',[]),
+  wins:ls('s6_wins',[]),
+  notes:ls('s6_notes',[]),
+  personal:ls('s6_personal',{
+    appts:[
+      {text:'Annual bloodwork / labs',done:false,id:1},{text:'Fertility / egg freezing consultation',done:false,id:2},
+      {text:'Peptide protocol consult',done:false,id:3},{text:'Annual physical',done:false,id:4},
+      {text:'Dermatologist',done:false,id:5},{text:'Hair appointment',done:false,id:6}
+    ],
+    sched:[],
+    healthNotes:[],
+    gl:{
+      books:[
+        {text:'The Psychology of Money — Morgan Housel',done:false,id:1},
+        {text:'I Will Teach You to Be Rich — Ramit Sethi',done:false,id:2}
+      ],
+      invest:[
+        {text:'Learn basics: index funds vs individual stocks',done:false,id:1},
+        {text:'Open a brokerage account if not already done',done:false,id:2},
+        {text:'Research: what is a Roth IRA vs Traditional IRA',done:false,id:3}
+      ],
+      shows:[]
+    },
+    admin:[]
+  })
+};
+// Merge seed acts if user has older storage without them
+if(S.activities.length < SEED_ACTS.length){
+  const existIds=new Set(S.activities.map(a=>a.id));
+  SEED_ACTS.forEach(a=>{if(!existIds.has(a.id))S.activities.push(a)});
+  lset('s6_acts',S.activities);
+}
+VENTURES.forEach(v=>{if(!S.tasks[v.id])S.tasks[v.id]=v.tasks.map(t=>({text:t,done:false}))});
+
+let activeV='fti',crmFilter='all',calDate=new Date(),editCxId=null;
+
+function goView(name,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('view-'+name).classList.add('on');
+  if(el)el.classList.add('on');
+  ({dashboard:renderDash,revenue:renderRevenue,crm:renderCRM,activities:renderActs,report:renderReport,calendar:renderCal,tracker:()=>{renderChips();renderVenture();},notes:()=>{renderWins();renderNotes();},personal:renderPersonal})[name]?.();
+}
+function swTab(name,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.tabv').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById('tabv-'+name).classList.add('on')}
+function swPTab(name,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.ptabv-active,#ptabv-health,#ptabv-growth,#ptabv-admin').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById('ptabv-'+name).classList.add('on')}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+
+// DASHBOARD
+function renderDash(){
+  const now=new Date(),h=now.getHours();
+  document.getElementById('d-greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Shelly.';
+  document.getElementById('d-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('d-week').textContent='Week of '+getMon(now).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  let tot=0,dn=0;VENTURES.forEach(v=>(S.tasks[v.id]||[]).forEach(t=>{tot++;if(t.done)dn++}));
+  const rev=S.revenue.reduce((s,p)=>s+Number(p.amt||0),0);
+  const fu=S.contacts.filter(c=>c.nextFollowup&&new Date(c.nextFollowup)<=new Date(Date.now()+7*864e5)).length;
+  document.getElementById('d-stats').innerHTML=`
+    <div class="stat"><div class="stat-n">${fmtM(rev)}</div><div class="stat-l">Revenue tracked</div><div class="stat-d">Floor $4M · Goal $8–10M</div></div>
+    <div class="stat"><div class="stat-n">${S.activities.length}</div><div class="stat-l">Activities logged</div><div class="stat-d">Jan–Mar 2026</div></div>
+    <div class="stat"><div class="stat-n">${S.contacts.length}</div><div class="stat-l">Contacts</div></div>
+    <div class="stat"><div class="stat-n">${fu}</div><div class="stat-l">Follow-ups this week</div><div class="stat-d" style="color:${fu>0?'var(--amber)':'var(--teal)'}">${fu>0?'Action needed':'All clear'}</div></div>`;
+  document.getElementById('d-focus').innerHTML=VENTURES.map(v=>{
+    const ts=S.tasks[v.id]||[],d=ts.filter(t=>t.done).length,pct=ts.length?Math.round(d/ts.length*100):0,nx=ts.find(t=>!t.done);
+    return `<div class="fc" onclick="goView('tracker',document.querySelector('[onclick*=tracker]'))"><div class="fc-name">${v.name}<span class="badge ${v.badge}" style="font-size:9px">${v.bl}</span></div><div style="font-size:11px;color:var(--ink3);margin-bottom:4px">${pct}% done</div><div class="prog"><div class="prog-fill pf-gold" style="width:${pct}%"></div></div>${nx?`<div class="fc-next">→ ${nx.text}</div>`:'<div style="font-size:11px;color:var(--teal);margin-top:8px;font-weight:500">✓ All done</div>'}</div>`;
+  }).join('');
+  const ups=S.contacts.filter(c=>c.nextFollowup).sort((a,b)=>new Date(a.nextFollowup)-new Date(b.nextFollowup)).slice(0,6);
+  document.getElementById('d-fu').innerHTML=ups.length?ups.map(c=>{
+    const diff=Math.round((new Date(c.nextFollowup)-Date.now())/864e5);
+    const cls=diff<0?'t-od':diff<=3?'t-sn':'t-ok';
+    const lbl=diff<0?`${Math.abs(diff)}d overdue`:diff===0?'Today':diff<=7?`${diff}d`:fmtD(c.nextFollowup);
+    const tc=c.tier==='Gold'?'#b8923a':c.tier==='Silver'?'#888780':'#a86820';
+    return `<div class="fu-row"><div class="fu-dot" style="background:${tc}"></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--ink)">${c.name}</div><div style="font-size:11px;color:var(--ink3);margin-top:1px">${c.company} · ${c.tier}</div></div><div class="fu-tag ${cls}">${lbl}</div></div>`;
+  }).join(''):'<div style="font-size:13px;color:var(--ink4)">No follow-ups tracked yet.</div>';
+  const ws=S.wins.slice(-3).reverse();
+  document.getElementById('d-wins').innerHTML=ws.length?ws.map(w=>`<div class="win-row"><span class="win-star">★</span><div style="flex:1;font-size:13px;color:var(--ink2)">${w.text}<span style="font-size:11px;color:var(--ink4);margin-left:8px">${w.date}</span></div></div>`).join(''):'<div style="font-size:13px;color:var(--ink4)">No wins logged yet.</div>';
+}
+
+// REVENUE
+function renderRevenue(){
+  const qf=document.getElementById('rev-qf').value;
+  const ps=qf==='all'?S.revenue:S.revenue.filter(p=>p.q===qf);
+  const tot=ps.reduce((s,p)=>s+Number(p.amt||0),0);
+  const bc={Relationship:0,Pursuit:0,Delivery:0};
+  ps.forEach(p=>bc[p.cat]=(bc[p.cat]||0)+Number(p.amt||0));
+  const floor=4e6,goal=9e6,pct=Math.min(100,Math.round(tot/floor*100));
+  document.getElementById('rev-hero').innerHTML=`<div class="rev-lbl">Total tracked · 2026</div><div class="rev-amt">${fmtM(tot)}</div><div class="rev-goal-txt">${fmtM(floor)} floor · ${fmtM(goal)} goal · ${pct}% to floor</div><div class="rev-pg-wrap"><div class="rev-pg-fill" style="width:${pct}%"></div><div class="rev-pg-mark" style="left:${Math.round(floor/goal*100)}%"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:rgba(255,255,255,.25);position:relative"><span>$0</span><span style="position:absolute;left:${Math.round(floor/goal*100)}%;transform:translateX(-50%);color:rgba(255,255,255,.4)">$4M floor</span><span>${fmtM(goal)}</span></div>`;
+  const cats=[{k:'Relationship',c:'var(--blue)',d:'Existing clients'},{k:'Pursuit',c:'var(--gold)',d:'Active pursuits'},{k:'Delivery',c:'var(--teal)',d:'Live engagements'}];
+  document.getElementById('rev-cats').innerHTML=cats.map(c=>{const amt=bc[c.k]||0,p=tot>0?Math.round(amt/tot*100):0;return `<div class="rev-cat"><div class="rev-cat-lbl">${c.k}</div><div class="rev-cat-amt">${fmtM(amt)}</div><div class="rev-cat-sub">${p}% of total · ${c.d}</div><div style="margin-top:10px"><div class="prog"><div class="prog-fill" style="width:${p}%;background:${c.c}"></div></div></div></div>`;}).join('');
+  const sorted=[...ps].sort((a,b)=>Number(b.amt)-Number(a.amt));
+  document.getElementById('rev-projs').innerHTML=sorted.length?sorted.map((p,i)=>`<div class="proj-row"><div class="proj-nm">${p.name}</div><span class="badge p-${p.cat.toLowerCase().slice(0,3)}" style="font-size:10px">${p.cat}</span><span style="font-size:10px;background:var(--parch2);padding:2px 8px;border-radius:99px">${p.q} 2026</span><div class="proj-amt">${fmtM(Number(p.amt))}</div>${p.notes?`<div style="font-size:11px;color:var(--ink4);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.notes}</div>`:''}<button class="btn-ic" onclick="delRevP(${S.revenue.indexOf(p)})" title="Remove">✕</button></div>`).join(''):'<div style="font-size:13px;color:var(--ink4);padding:1rem 0">No projects yet — add your first entry above.</div>';
+}
+function openRevModal(){document.getElementById('rev-modal').classList.add('open')}
+function closeRevModal(){document.getElementById('rev-modal').classList.remove('open')}
+function saveRevProj(){
+  const nm=document.getElementById('rp-nm').value.trim(),cat=document.getElementById('rp-cat').value,q=document.getElementById('rp-q').value,amt=document.getElementById('rp-amt').value,notes=document.getElementById('rp-notes').value.trim();
+  if(!nm||!amt)return toast('Enter a name and amount');
+  S.revenue.push({name:nm,cat,q,amt:Number(amt),notes});lset('s6_rev',S.revenue);
+  document.getElementById('rp-nm').value='';document.getElementById('rp-amt').value='';document.getElementById('rp-notes').value='';
+  closeRevModal();renderRevenue();renderDash();toast('Project added ✓');
+}
+function delRevP(i){if(!confirm('Remove?'))return;S.revenue.splice(i,1);lset('s6_rev',S.revenue);renderRevenue();renderDash()}
+
+// CRM
+function setCF(f,el){crmFilter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');renderCRM()}
+function renderCRM(){
+  const q=(document.getElementById('crm-q').value||'').toLowerCase();
+  let cx=[...S.contacts];
+  if(q)cx=cx.filter(c=>(c.name+c.company+c.type+c.tier+(c.notes||'')).toLowerCase().includes(q));
+  if(['Gold','Silver','Bronze'].includes(crmFilter))cx=cx.filter(c=>c.tier===crmFilter);
+  if(crmFilter==='Law Firm'||crmFilter==='Corporate')cx=cx.filter(c=>c.type===crmFilter);
+  if(crmFilter==='fu')cx=cx.filter(c=>c.nextFollowup&&new Date(c.nextFollowup)<=new Date(Date.now()+7*864e5));
+  cx.sort((a,b)=>({Gold:0,Silver:1,Bronze:2}[a.tier]||3)-({Gold:0,Silver:1,Bronze:2}[b.tier]||3)||a.name.localeCompare(b.name));
+  document.getElementById('crm-cnt').textContent=`${cx.length} contact${cx.length!==1?'s':''}`;
+  document.getElementById('cc-grid').innerHTML=cx.map(c=>{
+    const ini=c.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+    const tb=c.tier==='Gold'?'b-gold':c.tier==='Silver'?'b-silver':'b-bronze';
+    let fuHtml='';
+    if(c.nextFollowup){const diff=Math.round((new Date(c.nextFollowup)-Date.now())/864e5);const lbl=diff<0?`${Math.abs(diff)}d overdue`:diff===0?'Today':diff<=7?`In ${diff}d`:fmtD(c.nextFollowup);const cls=diff<0?'fu-tag t-od':diff<=3?'fu-tag t-sn':'fu-tag t-ok';fuHtml=`<div class="${cls}">${lbl}</div>`;}
+    return `<div class="cc" onclick="openCx(${c.id})"><div class="cc-top"><div class="cc-av">${ini}</div><div style="flex:1;min-width:0"><div class="cc-nm">${c.name}</div><div class="cc-co">${c.company}</div><div class="cc-type">${c.type}${c.need?' · '+c.need:''}</div></div><span class="badge ${tb}">${c.tier}</span></div><div class="cc-foot"><div class="cc-last">${c.lastOutreach?'Last: '+fmtD(c.lastOutreach):'No outreach logged'}</div>${fuHtml}</div>${c.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.4;border-top:.5px solid var(--parch2);padding-top:8px">${c.notes}</div>`:''}</div>`;
+  }).join('');
+}
+function openCx(id){
+  editCxId=id;
+  const c=id?S.contacts.find(x=>x.id===id)||{}:{};
+  const ini=c.name?(c.name.split(' ').map(w=>w[0]).slice(0,2).join('')):'?';
+  document.getElementById('cp-body').innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:1.5rem"><div style="width:50px;height:50px;border-radius:50%;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);border:.5px solid var(--gold-bd)">${ini}</div><div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500">${c.name||'New contact'}</div><div style="font-size:13px;color:var(--ink3)">${c.company||''}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div><label>Full name</label><input id="ec-nm" value="${c.name||''}"></div><div><label>Company / firm</label><input id="ec-co" value="${c.company||''}"></div><div><label>Type</label><select id="ec-tp">${['Law Firm','Corporate','PE','University','Non-profit','Other'].map(t=>`<option${c.type===t?' selected':''}>${t}</option>`).join('')}</select></div><div><label>Tier</label><select id="ec-tr">${['Gold','Silver','Bronze'].map(t=>`<option${c.tier===t?' selected':''}>${t}</option>`).join('')}</select></div><div><label>Last outreach</label><input id="ec-lo" type="date" value="${c.lastOutreach||''}"></div><div><label>Next follow-up</label><input id="ec-nf" type="date" value="${c.nextFollowup||''}"></div><div><label>Outreach type</label><input id="ec-ot" value="${c.outreachType||''}" placeholder="Lunch, email, call…"></div><div><label>D&A need</label><input id="ec-nd" value="${c.need||''}" placeholder="Investigations, Litigation…"></div><div style="grid-column:1/-1"><label>Notes</label><textarea id="ec-nt">${c.notes||''}</textarea></div></div><div class="btn-row"><button class="btn btn-p" onclick="saveCx()">Save</button><button class="btn" onclick="closeCx()">Close</button>${c.id?`<button class="btn" style="margin-left:auto;color:var(--danger);border-color:var(--danger)" onclick="delCx(${c.id})">Delete</button>`:''}</div>`;
+  document.getElementById('cp-overlay').style.display='flex';
+}
+function saveCx(){
+  const data={id:editCxId||Date.now(),name:document.getElementById('ec-nm').value.trim(),company:document.getElementById('ec-co').value.trim(),type:document.getElementById('ec-tp').value,tier:document.getElementById('ec-tr').value,lastOutreach:document.getElementById('ec-lo').value,nextFollowup:document.getElementById('ec-nf').value,outreachType:document.getElementById('ec-ot').value.trim(),need:document.getElementById('ec-nd').value.trim(),notes:document.getElementById('ec-nt').value.trim()};
+  if(!data.name)return toast('Enter a name');
+  if(editCxId){const i=S.contacts.findIndex(c=>c.id===editCxId);i>=0?S.contacts[i]=data:S.contacts.push(data);}else S.contacts.push(data);
+  lset('s6_cx',S.contacts);closeCx();renderCRM();renderDash();toast('Contact saved ✓');
+}
+function delCx(id){if(!confirm('Remove?'))return;S.contacts=S.contacts.filter(c=>c.id!==id);lset('s6_cx',S.contacts);closeCx();renderCRM();renderDash();toast('Removed')}
+function closeCx(){document.getElementById('cp-overlay').style.display='none'}
+
+// ACTIVITIES
+function logAct(){
+  const what=document.getElementById('a-what').value.trim(),cat=document.getElementById('a-cat').value,month=document.getElementById('a-month').value,notes=document.getElementById('a-notes').value.trim();
+  if(!what)return toast('Describe the activity');
+  S.activities.unshift({what,cat,month,year:2026,notes,id:Date.now()});
+  lset('s6_acts',S.activities);
+  document.getElementById('a-what').value='';document.getElementById('a-notes').value='';
+  renderActs();toast('Logged ✓');
+}
+function renderActs(){
+  const mf=document.getElementById('a-mo-filt').value,cf=document.getElementById('a-filt').value;
+  let acts=S.activities.slice().sort((a,b)=>MONTH_ORDER.indexOf(a.month)-MONTH_ORDER.indexOf(b.month));
+  if(mf!=='all')acts=acts.filter(a=>a.month===mf);
+  if(cf!=='all')acts=acts.filter(a=>a.cat===cf);
+  document.getElementById('a-cnt').textContent=`${acts.length} of ${S.activities.length} activities`;
+  document.getElementById('a-list').innerHTML=acts.length?acts.map((a,i)=>{
+    const col=ACT_CLR[a.cat]||'#888780';
+    const origI=S.activities.indexOf(a);
+    return `<div class="act-row"><div class="act-dot" style="background:${col}"></div><div style="flex:1"><div class="act-what">${a.what}</div><div class="act-meta"><span style="background:var(--parch2);padding:1px 7px;border-radius:99px;font-size:10px">${a.cat}</span><span style="background:var(--parch2);padding:1px 7px;border-radius:99px;font-size:10px">${a.month} 2026</span>${a.notes?`<span style="font-style:italic">${a.notes}</span>`:''}</div></div>${origI>=0&&!SEED_ACTS.find(s=>s.id===a.id)?`<button class="btn-ic" onclick="delAct(${origI})" title="Remove">✕</button>`:''}</div>`;
+  }).join(''):'<div style="font-size:13px;color:var(--ink4);padding:1rem 0">No activities match this filter.</div>';
+}
+function delAct(i){if(SEED_ACTS.find(s=>s.id===S.activities[i]?.id))return toast('Pre-loaded activities cannot be deleted');S.activities.splice(i,1);lset('s6_acts',S.activities);renderActs()}
+
+// LEADERSHIP REPORT
+function renderReport(){
+  const selMo=document.getElementById('rpt-mo').value;
+  let acts=S.activities.slice();
+  if(selMo!=='all')acts=acts.filter(a=>a.month===selMo);
+
+  const months=selMo==='all'?[...new Set(acts.map(a=>a.month))].sort((a,b)=>MONTH_ORDER.indexOf(a)-MONTH_ORDER.indexOf(b)):[selMo];
+  const totalActs=acts.length;
+  const byCat={};acts.forEach(a=>byCat[a.cat]=(byCat[a.cat]||0)+1);
+  const extActs=acts.filter(a=>!a.cat.startsWith('Internal')).length;
+  const intActs=acts.filter(a=>a.cat.startsWith('Internal')).length;
+  const conferences=acts.filter(a=>a.cat==='Conference').length;
+
+  let html=`<div class="report-hero">
+    <div class="rh-title">D&A Go-To-Market Summary · 2026</div>
+    <div class="rh-sub">Shelly Mady · Senior Managing Director · FTI Consulting Dallas${selMo!=='all'?' · '+selMo+' 2026':' · YTD'}</div>
+    <div class="rh-stats">
+      <div class="rh-stat"><div class="rh-stat-n">${totalActs}</div><div class="rh-stat-l">Total activities</div></div>
+      <div class="rh-stat"><div class="rh-stat-n">${extActs}</div><div class="rh-stat-l">External touchpoints</div></div>
+      <div class="rh-stat"><div class="rh-stat-n">${conferences}</div><div class="rh-stat-l">Conferences</div></div>
+      <div class="rh-stat"><div class="rh-stat-n">${months.length}</div><div class="rh-stat-l">Month${months.length!==1?'s':''} covered</div></div>
+    </div>
+  </div>`;
+
+  // Category breakdown summary
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:1.5rem">`;
+  Object.entries(ACT_CLR).forEach(([cat,col])=>{
+    const cnt=byCat[cat]||0;if(!cnt)return;
+    const pct=Math.round(cnt/totalActs*100);
+    html+=`<div class="card" style="padding:12px 16px;margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></span><div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em">${cat}</div></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--ink);line-height:1">${cnt}</div>
+      <div style="font-size:10px;color:var(--ink4);margin-top:3px">${pct}% of total</div>
+      <div style="margin-top:8px"><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div></div>
+    </div>`;
+  });
+  html+='</div>';
+
+  // Month by month detail
+  months.forEach(mo=>{
+    const moActs=acts.filter(a=>a.month===mo);
+    const moCats={};moActs.forEach(a=>moCats[a.cat]=(moCats[a.cat]||[]).concat(a));
+    const moName={Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'}[mo]||mo;
+    html+=`<div class="month-section">
+      <div class="month-hd" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+        <div class="month-hd-left">
+          <div class="month-name">${moName}</div>
+          <div class="month-count">${moActs.length} activit${moActs.length!==1?'ies':'y'}</div>
+        </div>
+        <div style="font-size:12px;color:var(--ink3)">▾</div>
+      </div>
+      <div class="month-body">`;
+
+    const catOrder=['BD/Marketing Support','Corporate Outreach','Law Firm Outreach','Conference','Law Firm Event','Internal Outreach','Internal - Strategy'];
+    catOrder.forEach(cat=>{
+      const catActs=moCats[cat];if(!catActs||!catActs.length)return;
+      const col=ACT_CLR[cat]||'#888780';
+      html+=`<div class="cat-group">
+        <div class="cat-group-hd"><span class="cat-dot" style="background:${col}"></span><div class="cat-group-name">${cat}</div><div class="cat-group-cnt">${catActs.length}</div></div>
+        ${catActs.map(a=>`<div class="act-item"><div style="width:4px;height:4px;border-radius:50%;background:${col};flex-shrink:0;margin-top:7px"></div><div class="act-item-txt">${a.what}${a.notes?`<div class="act-item-note">${a.notes}</div>`:''}</div></div>`).join('')}
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+
+  document.getElementById('report-body').innerHTML=html;
+}
+
+// CALENDAR
+function getMon(d){const day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);return new Date(d.getFullYear(),d.getMonth(),diff)}
+function renderCal(){document.getElementById('cal-view').value==='week'?renderWkCal():renderMoCal()}
+function renderMoCal(){
+  const y=calDate.getFullYear(),m=calDate.getMonth(),first=new Date(y,m,1),sd=first.getDay(),dim=new Date(y,m+1,0).getDate(),today=new Date();
+  document.getElementById('cal-ttl').textContent=new Date(y,m,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let h=`<div class="cal-grid">${days.map(d=>`<div class="cal-dh">${d}</div>`).join('')}`;
+  for(let i=0;i<sd;i++){const dd=new Date(y,m,-sd+i+1);h+=`<div class="cal-day om"><div class="cal-dn">${dd.getDate()}</div></div>`}
+  for(let d=1;d<=dim;d++){
+    const it=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const blks=S.cal.filter(b=>b.date===ds);
+    h+=`<div class="cal-day${it?' today':''}" onclick="document.getElementById('blk-dt').value='${ds}'"><div class="cal-dn">${d}</div>${blks.map(b=>`<div class="cal-ev ${CAT_CSS[b.cat]||'ev-life'}">${b.time?b.time+' ':''}${b.label}</div>`).join('')}</div>`;
+  }
+  const rem=42-sd-dim;for(let i=1;i<=rem;i++)h+=`<div class="cal-day om"><div class="cal-dn">${i}</div></div>`;
+  h+='</div>';document.getElementById('cal-body').innerHTML=h;
+}
+function renderWkCal(){
+  const mon=getMon(calDate),today=new Date(),days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  document.getElementById('cal-ttl').textContent='Week of '+mon.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  let h='<div class="wk-grid">';
+  for(let i=0;i<7;i++){
+    const d=new Date(mon);d.setDate(mon.getDate()+i);
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const it=d.toDateString()===today.toDateString(),blks=S.cal.filter(b=>b.date===ds);
+    h+=`<div class="wk-col${it?' today-col':''}"><div class="wk-hd"><div class="wk-dy">${days[i]}</div><div class="wk-dt">${d.getDate()}</div></div><div class="wk-blks">${blks.length?blks.map((b)=>{const gi=S.cal.findIndex(x=>x.date===ds&&x.label===b.label&&x.time===b.time);const col=CAT_COLORS[b.cat]||'#888780';return `<div class="wk-blk" style="background:${col}18;border-left:2px solid ${col}"><div class="blk-tm" style="color:${col}">${b.time||''}</div><div class="blk-lb" style="color:${col}">${b.label}</div><button class="blk-x" onclick="event.stopPropagation();delBlk(${gi})">✕</button></div>`}).join(''):'<div style="font-size:10px;color:var(--ink5);padding:4px 2px">Free</div>'}</div></div>`;
+  }
+  h+='</div>';document.getElementById('cal-body').innerHTML=h;
+}
+function calNav(d){const v=document.getElementById('cal-view').value;v==='week'?calDate.setDate(calDate.getDate()+d*7):calDate.setMonth(calDate.getMonth()+d);renderCal()}
+function calToday(){calDate=new Date();renderCal()}
+function addBlk(){
+  const date=document.getElementById('blk-dt').value,time=document.getElementById('blk-tm').value.trim(),label=document.getElementById('blk-lb').value.trim(),cat=document.getElementById('blk-ct').value;
+  if(!date||!label)return toast('Enter a date and label');
+  S.cal.push({date,time,label,cat});lset('s6_cal',S.cal);
+  document.getElementById('blk-tm').value='';document.getElementById('blk-lb').value='';
+  renderCal();toast('Block added ✓');
+}
+function delBlk(i){S.cal.splice(i,1);lset('s6_cal',S.cal);renderCal()}
+
+// TRACKER
+function renderChips(){document.getElementById('v-chips').innerHTML=VENTURES.map(v=>`<div class="chip${v.id===activeV?' on':''}" onclick="setV('${v.id}')">${v.name}</div>`).join('')}
+function setV(id){activeV=id;renderChips();renderVenture()}
+function renderVenture(){
+  const v=VENTURES.find(x=>x.id===activeV),ts=S.tasks[v.id]||[],dn=ts.filter(t=>t.done).length,pct=ts.length?Math.round(dn/ts.length*100):0;
+  document.getElementById('v-detail').innerHTML=`<div class="card"><div class="card-hd"><div><div class="card-title">${v.name}</div><div class="card-sub">${dn} of ${ts.length} complete · ${pct}%</div></div><span class="badge ${v.badge}">${v.bl}</span></div><div class="prog" style="margin-bottom:16px"><div class="prog-fill pf-gold" style="width:${pct}%"></div></div>${ts.map((t,i)=>`<div class="task-row"><input type="checkbox" ${t.done?'checked':''} onchange="togT('${v.id}',${i})"><div class="task-txt${t.done?' done':''}">${t.text}</div><button class="btn-ic" onclick="delT('${v.id}',${i})">✕</button></div>`).join('')}<div style="display:flex;gap:8px;margin-top:12px"><input type="text" id="nt-${v.id}" placeholder="Add an action…" style="flex:1" onkeydown="if(event.key==='Enter')addT('${v.id}')"><button class="btn btn-p btn-sm" onclick="addT('${v.id}')">Add</button></div></div>`;
+}
+function togT(vid,i){S.tasks[vid][i].done=!S.tasks[vid][i].done;lset('s6_tasks',S.tasks);renderVenture();renderDash()}
+function delT(vid,i){S.tasks[vid].splice(i,1);lset('s6_tasks',S.tasks);renderVenture();renderDash()}
+function addT(vid){const inp=document.getElementById('nt-'+vid),txt=inp.value.trim();if(!txt)return;S.tasks[vid].push({text:txt,done:false});lset('s6_tasks',S.tasks);inp.value='';renderVenture();renderDash()}
+
+// NOTES & WINS
+function addWin(){const inp=document.getElementById('win-in'),txt=inp.value.trim();if(!txt)return;S.wins.push({text:txt,date:fmtD(new Date().toISOString().split('T')[0]),id:Date.now()});lset('s6_wins',S.wins);inp.value='';renderWins();renderDash();toast('Win logged ★')}
+function renderWins(){document.getElementById('wins-list').innerHTML=S.wins.length?S.wins.slice().reverse().map((w,ri)=>{const i=S.wins.length-1-ri;return `<div class="win-row"><span class="win-star">★</span><div style="flex:1;font-size:13px;color:var(--ink2)">${w.text}<span style="font-size:11px;color:var(--ink4);margin-left:8px">${w.date}</span></div><button class="btn-ic" onclick="delWin(${i})">✕</button></div>`}).join(''):'<div style="font-size:13px;color:var(--ink4)">No wins yet.</div>'}
+function delWin(i){S.wins.splice(i,1);lset('s6_wins',S.wins);renderWins();renderDash()}
+function addNote(){const txt=document.getElementById('note-in').value.trim(),v=document.getElementById('note-v').value;if(!txt)return toast('Enter a note');S.notes.push({text:txt,venture:v,date:fmtD(new Date().toISOString().split('T')[0]),id:Date.now()});lset('s6_notes',S.notes);document.getElementById('note-in').value='';renderNotes();toast('Saved ✓')}
+function renderNotes(){document.getElementById('notes-list').innerHTML=S.notes.length?S.notes.slice().reverse().map((n,ri)=>{const i=S.notes.length-1-ri;return `<div class="note-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:10px;padding:2px 9px;border-radius:99px;background:var(--parch2);color:var(--ink3);border:.5px solid var(--parch3);text-transform:uppercase;letter-spacing:.06em">${VNAMES[n.venture]||n.venture}</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--ink4)">${n.date}</span><button class="btn-ic" onclick="delNote(${i})">✕</button></div></div><div style="font-size:13px;color:var(--ink2);line-height:1.55">${n.text}</div></div>`}).join(''):'<div style="font-size:13px;color:var(--ink4)">No notes yet.</div>'}
+function delNote(i){S.notes.splice(i,1);lset('s6_notes',S.notes);renderNotes()}
+
+
+// PERSONAL
+function renderPersonal(){renderHAppts();renderHSched();renderHNotes();renderGL('books');renderGL('invest');renderGL('shows');renderAdmin();}
+
+function addHAppt(){const inp=document.getElementById('h-appt-in'),txt=inp.value.trim();if(!txt)return;S.personal.appts.push({text:txt,done:false,id:Date.now()});lset('s6_personal',S.personal);inp.value='';renderHAppts()}
+function renderHAppts(){const el=document.getElementById('h-appts');if(!el)return;const items=S.personal.appts;el.innerHTML=items.length?items.map((a,i)=>`<div class="task-row"><input type="checkbox" ${a.done?'checked':''} onchange="togHAppt(${i})" style="accent-color:var(--blush)"><div class="task-txt${a.done?' done':''}">${a.text}</div><button class="btn-ic" onclick="delHAppt(${i})">✕</button></div>`).join(''):'<div style="font-size:13px;color:var(--ink4);padding:6px 0">Nothing queued up.</div>'}
+function togHAppt(i){S.personal.appts[i].done=!S.personal.appts[i].done;lset('s6_personal',S.personal);renderHAppts()}
+function delHAppt(i){S.personal.appts.splice(i,1);lset('s6_personal',S.personal);renderHAppts()}
+
+function addHSched(){const what=document.getElementById('h-sch-what').value.trim(),date=document.getElementById('h-sch-date').value;if(!what)return;S.personal.sched.push({what,date,id:Date.now()});lset('s6_personal',S.personal);document.getElementById('h-sch-what').value='';document.getElementById('h-sch-date').value='';renderHSched()}
+function renderHSched(){const el=document.getElementById('h-sched');if(!el)return;const items=[...S.personal.sched].sort((a,b)=>a.date&&b.date?new Date(a.date)-new Date(b.date):0);el.innerHTML=items.length?items.map((s,i)=>{const orig=S.personal.sched.indexOf(s);const diff=s.date?Math.round((new Date(s.date+'T12:00:00')-Date.now())/864e5):null;const tag=diff===null?'':`<span class="fu-tag ${diff<0?'t-od':diff<=7?'t-sn':'t-ok'}" style="font-size:10px">${diff<0?Math.abs(diff)+'d ago':diff===0?'Today':'In '+diff+'d'}</span>`;return `<div class="task-row"><span style="font-size:14px;flex-shrink:0">📅</span><div class="task-txt" style="flex:1">${s.what}${s.date?`<span style="font-size:11px;color:var(--ink4);margin-left:6px">${fmtD(s.date)}</span>`:''}</div>${tag}<button class="btn-ic" onclick="delHSched(${orig})">✕</button></div>`}).join(''):'<div style="font-size:13px;color:var(--ink4);padding:6px 0">No upcoming appointments.</div>'}
+function delHSched(i){S.personal.sched.splice(i,1);lset('s6_personal',S.personal);renderHSched()}
+
+function addHNote(){const inp=document.getElementById('h-note-in'),txt=inp.value.trim();if(!txt)return;S.personal.healthNotes.push({text:txt,date:fmtD(new Date().toISOString().split('T')[0]),id:Date.now()});lset('s6_personal',S.personal);inp.value='';renderHNotes()}
+function renderHNotes(){const el=document.getElementById('h-notes');if(!el)return;el.innerHTML=S.personal.healthNotes.length?S.personal.healthNotes.slice().reverse().map((n,ri)=>{const i=S.personal.healthNotes.length-1-ri;return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:.5px solid var(--parch2)"><span style="font-size:12px;flex-shrink:0;margin-top:2px">🩺</span><div style="flex:1;font-size:13px;color:var(--ink);line-height:1.4">${n.text}<span style="font-size:11px;color:var(--ink4);margin-left:8px">${n.date}</span></div><button class="btn-ic" onclick="delHNote(${i})">✕</button></div>`}).join(''):'<div style="font-size:13px;color:var(--ink4);padding:6px 0">No notes yet.</div>'}
+function delHNote(i){S.personal.healthNotes.splice(i,1);lset('s6_personal',S.personal);renderHNotes()}
+
+function addGL(list,inputId){const inp=document.getElementById(inputId),txt=inp.value.trim();if(!txt)return;S.personal.gl[list].push({text:txt,done:false,id:Date.now()});lset('s6_personal',S.personal);inp.value='';renderGL(list)}
+function renderGL(list){const elMap={books:'gl-books',invest:'gl-invest',shows:'gl-shows'};const el=document.getElementById(elMap[list]);if(!el)return;const items=S.personal.gl[list];el.innerHTML=items.length?items.map((a,i)=>`<div class="task-row"><input type="checkbox" ${a.done?'checked':''} onchange="togGL('${list}',${i})" style="accent-color:var(--teal)"><div class="task-txt${a.done?' done':''}">${a.text}</div><button class="btn-ic" onclick="delGL('${list}',${i})">✕</button></div>`).join(''):'<div style="font-size:13px;color:var(--ink4);padding:6px 0">Nothing added yet.</div>'}
+function togGL(list,i){S.personal.gl[list][i].done=!S.personal.gl[list][i].done;lset('s6_personal',S.personal);renderGL(list)}
+function delGL(list,i){S.personal.gl[list].splice(i,1);lset('s6_personal',S.personal);renderGL(list)}
+
+function addAdmin(){const inp=document.getElementById('la-in'),txt=inp.value.trim();if(!txt)return;S.personal.admin.push({text:txt,done:false,id:Date.now()});lset('s6_personal',S.personal);inp.value='';renderAdmin()}
+function renderAdmin(){const el=document.getElementById('la-list');if(!el)return;const items=S.personal.admin;const todo=items.filter(a=>!a.done).length;document.getElementById('la-cnt').textContent=`${todo} remaining · ${items.length-todo} done`;el.innerHTML=items.length?[...items.filter(a=>!a.done),...items.filter(a=>a.done)].map((a)=>{const i=S.personal.admin.indexOf(a);return `<div class="task-row"><input type="checkbox" ${a.done?'checked':''} onchange="togAdmin(${i})" style="accent-color:var(--gold)"><div class="task-txt${a.done?' done':''}">${a.text}</div><button class="btn-ic" onclick="delAdmin(${i})">✕</button></div>`}).join(''):'<div style="font-size:13px;color:var(--ink4);padding:6px 0">All clear — nothing on the list.</div>'}
+function togAdmin(i){S.personal.admin[i].done=!S.personal.admin[i].done;lset('s6_personal',S.personal);renderAdmin()}
+function delAdmin(i){S.personal.admin.splice(i,1);lset('s6_personal',S.personal);renderAdmin()}
+function clearAdmin(){S.personal.admin=S.personal.admin.filter(a=>!a.done);lset('s6_personal',S.personal);renderAdmin();toast('Cleared ✓')}
+
+// UTILS
+function fmtM(n){if(n>=1e6)return '$'+(n/1e6).toFixed(1).replace(/\.0$/,'')+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(0)+'K';return '$'+n.toLocaleString()}
+function fmtD(s){if(!s)return '';const d=new Date(s+'T12:00:00');return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'})}
+
+function init(){
+  document.getElementById('blk-dt').value=new Date().toISOString().split('T')[0];
+  // Set default month in activity logger to current month
+  const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const curMo=moNames[new Date().getMonth()];
+  const sel=document.getElementById('a-month');
+  for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===curMo){sel.selectedIndex=i;break;}}
+  renderDash();
+}
+init();
+</script>
+</body>
+</html>
