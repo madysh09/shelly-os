@@ -485,9 +485,78 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
   .cal-entry-grid > *:nth-child(4){grid-column:1}
   .cal-entry-grid > *:nth-child(5){grid-column:2;padding-top:18px}
 }
+
+/* PIN LOCK */
+#pin-overlay{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#pin-overlay.hidden{display:none}
+.pin-brand{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:var(--gold2);margin-bottom:6px;letter-spacing:.02em}
+.pin-sub{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2.5rem}
+.pin-dots{display:flex;gap:14px;margin-bottom:2rem}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .2s}
+.pin-dot.filled{background:var(--gold2)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:220px}
+.pin-btn{background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.1);border-radius:var(--r);padding:18px;font-size:20px;font-weight:500;color:#fff;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;transition:background .15s;user-select:none}
+.pin-btn:hover,.pin-btn:active{background:rgba(255,255,255,.14)}
+.pin-btn.del{font-size:16px;color:rgba(255,255,255,.4)}
+.pin-error{font-size:12px;color:var(--blush);margin-top:1rem;height:18px;text-align:center;letter-spacing:.04em}
+.pin-hint{font-size:11px;color:rgba(255,255,255,.18);margin-top:2rem;cursor:pointer;text-decoration:underline}
+.pin-hint:hover{color:rgba(255,255,255,.35)}
+
+@keyframes pinshake{
+  0%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+  100%{transform:translateX(0)}
+}
 </style>
 </head>
 <body>
+
+<!-- PIN LOCK OVERLAY -->
+<div id="pin-overlay">
+  <div class="pin-brand">Shelly's OS</div>
+  <div class="pin-sub">Enter your PIN to continue</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-pad">
+    <div class="pin-btn" onclick="pinPress('1')">1</div>
+    <div class="pin-btn" onclick="pinPress('2')">2</div>
+    <div class="pin-btn" onclick="pinPress('3')">3</div>
+    <div class="pin-btn" onclick="pinPress('4')">4</div>
+    <div class="pin-btn" onclick="pinPress('5')">5</div>
+    <div class="pin-btn" onclick="pinPress('6')">6</div>
+    <div class="pin-btn" onclick="pinPress('7')">7</div>
+    <div class="pin-btn" onclick="pinPress('8')">8</div>
+    <div class="pin-btn" onclick="pinPress('9')">9</div>
+    <div class="pin-btn" style="visibility:hidden"></div>
+    <div class="pin-btn" onclick="pinPress('0')">0</div>
+    <div class="pin-btn del" onclick="pinDel()">⌫</div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-hint" onclick="showPinChange()">Change PIN</div>
+</div>
+
+<!-- PIN CHANGE MODAL -->
+<div id="pin-change-modal" style="display:none;position:fixed;inset:0;background:rgba(24,24,15,.7);z-index:10000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:var(--rx);padding:2rem;width:100%;max-width:340px;text-align:center">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:.5rem">Change PIN</div>
+    <div style="font-size:13px;color:var(--ink3);margin-bottom:1.25rem">Enter a new 4-digit PIN</div>
+    <input id="new-pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="New PIN" style="text-align:center;letter-spacing:.3em;font-size:20px;padding:12px;border:.5px solid var(--parch3);border-radius:var(--rs);width:100%;margin-bottom:10px">
+    <input id="confirm-pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="Confirm PIN" style="text-align:center;letter-spacing:.3em;font-size:20px;padding:12px;border:.5px solid var(--parch3);border-radius:var(--rs);width:100%;margin-bottom:1rem">
+    <div id="pin-change-error" style="font-size:12px;color:var(--blush);margin-bottom:10px;min-height:18px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" onclick="saveNewPin()" style="flex:1">Save PIN</button>
+      <button class="btn" onclick="document.getElementById('pin-change-modal').style.display='none'" style="flex:1">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sb">
   <div class="sb-brand"><div class="sb-title">Shelly's OS</div><div class="sb-sub">Command Center · 2026</div></div>
@@ -541,10 +610,16 @@ label{display:block;font-size:10px;font-weight:500;color:var(--ink3);margin-bott
   <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:.5px solid var(--parch2)">
     <div style="font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Daily digest</div>
     <div style="font-size:12px;color:var(--ink4);margin-bottom:10px;line-height:1.5">Open tasks across all ventures + life admin — pre-formatted for email.</div>
-    <button class="btn btn-p btn-sm" onclick="sendDigest()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-      Send daily digest
-    </button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-p btn-sm" onclick="sendDigest()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        Send daily digest
+      </button>
+      <button class="btn btn-sm" onclick="exportCSV()" style="border-color:var(--teal);color:var(--teal)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export to CSV
+      </button>
+    </div>
   </div></div>
 </div>
 
@@ -2452,6 +2527,148 @@ function init(){
   renderDash();
 }
 init();
+
+
+// ═══════════════════════════════════
+// PIN LOCK
+// ═══════════════════════════════════
+const DEFAULT_PIN = '1234'; // Change this to your preferred default
+let pinBuffer = '';
+let pinUnlocked = false;
+
+function pinInit(){
+  // Check if already unlocked this session
+  if(sessionStorage.getItem('sos_unlocked')==='1'){
+    document.getElementById('pin-overlay').classList.add('hidden');
+    pinUnlocked = true;
+    return;
+  }
+  // Show PIN screen
+  document.getElementById('pin-overlay').classList.remove('hidden');
+}
+
+function pinPress(digit){
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if(pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+
+function pinDel(){
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+function checkPin(){
+  const storedPin = localStorage.getItem('sos_pin') || DEFAULT_PIN;
+  if(pinBuffer === storedPin){
+    sessionStorage.setItem('sos_unlocked','1');
+    document.getElementById('pin-overlay').classList.add('hidden');
+    pinUnlocked = true;
+    document.getElementById('pin-error').textContent = '';
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+    pinBuffer = '';
+    updatePinDots();
+    // Shake animation
+    const dots = document.getElementById('pin-dots');
+    dots.style.animation = 'none';
+    setTimeout(()=>{ dots.style.animation = 'pinshake .4s ease'; }, 10);
+  }
+}
+
+function showPinChange(){
+  document.getElementById('pin-change-modal').style.display = 'flex';
+  document.getElementById('new-pin-input').value = '';
+  document.getElementById('confirm-pin-input').value = '';
+  document.getElementById('pin-change-error').textContent = '';
+}
+
+function saveNewPin(){
+  const np = document.getElementById('new-pin-input').value.trim();
+  const cp = document.getElementById('confirm-pin-input').value.trim();
+  if(!/^\d{4}$/.test(np)){ document.getElementById('pin-change-error').textContent = 'PIN must be exactly 4 digits'; return; }
+  if(np !== cp){ document.getElementById('pin-change-error').textContent = 'PINs do not match'; return; }
+  localStorage.setItem('sos_pin', np);
+  document.getElementById('pin-change-modal').style.display = 'none';
+  document.getElementById('pin-error').textContent = 'PIN updated ✓';
+  setTimeout(()=>{ document.getElementById('pin-error').textContent = ''; }, 2000);
+}
+
+// Keyboard support for PIN
+document.addEventListener('keydown', function(e){
+  if(pinUnlocked) return;
+  if(e.key >= '0' && e.key <= '9') pinPress(e.key);
+  if(e.key === 'Backspace') pinDel();
+});
+
+
+// ═══════════════════════════════════
+// CSV / DATA EXPORT
+// ═══════════════════════════════════
+function exportCSV(){
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).replace(/,/g,'');
+  const esc=v=>{const s=String(v===null||v===undefined?'':v).replace(/"/g,'""');return s.includes(',')||s.includes('"')||s.includes('\n')?`"${s}"`:s};
+  const row=cols=>cols.map(esc).join(',');
+  const sheet=(name,headers,rows)=>({name,csv:[row(headers),...rows.map(r=>row(r))].join('\n')});
+  const sheets=[];
+
+  const cxRows=(S.contacts||[]).map(c=>[c.name,c.company,c.type,c.tier,c.lastOutreach,c.nextFollowup,c.outreachType,c.need,c.notes]);
+  sheets.push(sheet('Contacts',['Name','Company','Type','Tier','Last Outreach','Next Follow-up','Outreach Type','Need','Notes'],cxRows));
+
+  const actRows=(S.activities||[]).map(a=>[a.what,a.cat,a.month,a.year,a.notes]);
+  sheets.push(sheet('Activities',['Activity','Category','Month','Year','Notes'],actRows));
+
+  const revRows=(S.revenue||[]).map(p=>[p.name,p.cat,p.q,p.amt,p.notes]);
+  sheets.push(sheet('Revenue',['Project','Category','Quarter','Amount ($)','Notes'],revRows));
+
+  const spRows=(S.sponsorships||[]).map(s=>[s.event,s.org,s.month,s.daCost,s.totalCost,s.teams,s.status,s.notes]);
+  sheets.push(sheet('Sponsorships',['Event','Organization','Month','D&A Cost','Total Cost','Teams','Status','Notes'],spRows));
+
+  const vtRows=[];
+  VENTURES.forEach(v=>{const vt=S.vtasks&&S.vtasks[v.id];if(!vt)return;['learning','tactical','networking'].forEach(cat=>{(vt[cat]||[]).forEach(t=>vtRows.push([v.name,cat,t.text,t.done?'Done':'Open',t.month||'']));});});
+  sheets.push(sheet('Venture Tasks',['Venture','Category','Task','Status','Target Month'],vtRows));
+
+  const winRows=(S.wins||[]).map(w=>[w.text,w.date]);
+  sheets.push(sheet('Wins',['Win','Date'],winRows));
+
+  const noteRows=(S.notes||[]).map(n=>[VNAMES[n.venture]||n.venture,n.text,n.date]);
+  sheets.push(sheet('Strategy Notes',['Venture','Note','Date'],noteRows));
+
+  const adminRows=(S.personal&&S.personal.admin||[]).map(a=>[a.text,a.done?'Done':'Open',a.completedDate||'']);
+  sheets.push(sheet('Life Admin',['Task','Status','Completed Date'],adminRows));
+
+  const apptRows=(S.personal&&S.personal.appts||[]).map(a=>[a.text,a.done?'Booked':'To Schedule']);
+  sheets.push(sheet('Health To Schedule',['Appointment','Status'],apptRows));
+
+  const schedRows=(S.personal&&S.personal.sched||[]).map(s=>[s.what,s.date,s.calCat||'']);
+  sheets.push(sheet('Scheduled Appts',['Appointment','Date','Category'],schedRows));
+
+  const hlRows=(S.personal&&S.personal.healthNotes||[]).map(n=>[n.text,n.date]);
+  sheets.push(sheet('Health Notes',['Note','Date'],hlRows));
+
+  let combined=`Shelly's OS Data Export\nGenerated: ${dateStr}\n`;
+  sheets.forEach(s=>{combined+=`\n=== ${s.name.toUpperCase()} ===\n`+s.csv+'\n';});
+
+  const blob=new Blob([combined],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`ShellysOS_Export_${dateStr.replace(/ /g,'_')}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Export downloaded ✓');
+}
+
+pinInit();
+
 </script>
 </body>
 </html>
